@@ -102,6 +102,7 @@ export async function generateImageFromPrompt(
 
   const imageFile = await toFile(pngBuffer, "base.png", { type: "image/png" });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const openaiPromise = openai.images.edit({
     model: "gpt-image-1.5",
     image: imageFile,
