@@ -51,7 +51,7 @@ export default function Step5Palette() {
         name="palette"
         render={({ field }) => (
           <FormItem>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {PALETTE_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}

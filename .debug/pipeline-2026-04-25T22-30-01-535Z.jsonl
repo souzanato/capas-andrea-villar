@@ -1,0 +1,44 @@
+{"ts":"2026-04-25T22:30:01.535Z","delta":1198,"fn":"POST /api/covers/[id]/generate","event":"enter","data":{"coverId":"cmoewwzmr00020zgida4o1tqa"}}
+{"ts":"2026-04-25T22:30:01.554Z","delta":19,"fn":"POST /api/covers/[id]/generate","event":"log","data":{"phase":"starting_pipeline","coverId":"cmoewwzmr00020zgida4o1tqa","status":"PENDING"}}
+{"ts":"2026-04-25T22:30:01.555Z","delta":1,"fn":"runFullPipeline","event":"enter","data":{"coverId":"cmoewwzmr00020zgida4o1tqa"}}
+{"ts":"2026-04-25T22:30:01.563Z","delta":8,"fn":"runFullPipeline","event":"log","data":{"phase":"GENERATING_PROMPT"}}
+{"ts":"2026-04-25T22:30:01.574Z","delta":11,"fn":"runFullPipeline","event":"log","data":{"phase":"GENERATING_PROMPT","baseImageSize":150542}}
+{"ts":"2026-04-25T22:30:01.574Z","delta":0,"fn":"generatePromptFromInputs","event":"enter","data":{"title":"O que as mães realmente precisam","format":"REELS_9_16"}}
+{"ts":"2026-04-25T22:30:01.575Z","delta":1,"fn":"generatePromptFromInputs","event":"log","data":{"attempt":1,"maxAttempts":3,"lastError":null}}
+{"ts":"2026-04-25T22:30:01.575Z","delta":0,"fn":"generatePromptFromInputsRaw","event":"enter","data":{"title":"O que as mães realmente precisam","format":"REELS_9_16","hasAdditionalInstruction":false}}
+{"ts":"2026-04-25T22:30:01.578Z","delta":3,"fn":"generatePromptFromInputsRaw","event":"http_request","data":{"model":"gpt-4o","temperature":0.4,"max_tokens":4000,"messageLength":2258}}
+{"ts":"2026-04-25T22:30:14.946Z","delta":13368,"fn":"generatePromptFromInputsRaw","event":"http_response","data":{"status":"ok","contentLength":4852,"finishReason":"stop"}}
+{"ts":"2026-04-25T22:30:14.947Z","delta":1,"fn":"validateChecklistPassed","event":"enter","data":{"responseLength":4852}}
+{"ts":"2026-04-25T22:30:14.948Z","delta":1,"fn":"validateChecklistPassed","event":"log","data":{"yesCount":12,"noCount":0}}
+{"ts":"2026-04-25T22:30:14.948Z","delta":0,"fn":"validateChecklistPassed","event":"exit","data":{"yesCount":12}}
+{"ts":"2026-04-25T22:30:14.948Z","delta":0,"fn":"extractOnlyFinalPromptSection","event":"enter","data":{"fullLength":4852}}
+{"ts":"2026-04-25T22:30:14.949Z","delta":1,"fn":"extractOnlyFinalPromptSection","event":"exit","data":{"method":"regex","length":2965}}
+{"ts":"2026-04-25T22:30:14.950Z","delta":1,"fn":"validateExtractedPrompt","event":"enter","data":{"title":"O que as mães realmente precisam","promptLength":2965}}
+{"ts":"2026-04-25T22:30:14.951Z","delta":1,"fn":"validateExtractedPrompt","event":"exit","data":{"uniqueWords":6}}
+{"ts":"2026-04-25T22:30:14.951Z","delta":0,"fn":"validateConnectorPlacement","event":"enter","data":{"sectionLength":2965}}
+{"ts":"2026-04-25T22:30:14.951Z","delta":0,"fn":"validateConnectorPlacement","event":"exit","data":{"totalLines":2,"connectorLines":0}}
+{"ts":"2026-04-25T22:30:14.951Z","delta":0,"fn":"validateGeometricBalance","event":"enter"}
+{"ts":"2026-04-25T22:30:14.952Z","delta":1,"fn":"validateGeometricBalance","event":"log","data":{"lines":{"0":"O que as mães","1":"realmente precisam"},"charCounts":{"0":10,"1":17},"diff":"41%"}}
+{"ts":"2026-04-25T22:30:14.952Z","delta":0,"fn":"validateGeometricBalance","event":"exit","data":{"diff":"41%"}}
+{"ts":"2026-04-25T22:30:14.952Z","delta":0,"fn":"validateNoMetadataLeakage","event":"enter"}
+{"ts":"2026-04-25T22:30:14.952Z","delta":0,"fn":"validateNoMetadataLeakage","event":"exit","data":"No leakage detected"}
+{"ts":"2026-04-25T22:30:14.952Z","delta":0,"fn":"validateNoShadowLanguage","event":"enter"}
+{"ts":"2026-04-25T22:30:14.953Z","delta":1,"fn":"validateNoShadowLanguage","event":"exit","data":{"hasIllumination":true}}
+{"ts":"2026-04-25T22:30:14.953Z","delta":0,"fn":"validateFontStyleChoice","event":"enter"}
+{"ts":"2026-04-25T22:30:14.953Z","delta":0,"fn":"validateFontStyleChoice","event":"log","data":{"ignoredInNegativeContext":"Druk Wide"}}
+{"ts":"2026-04-25T22:30:14.954Z","delta":1,"fn":"validateFontStyleChoice","event":"log","data":{"ignoredInNegativeContext":"Druk Wide"}}
+{"ts":"2026-04-25T22:30:14.955Z","delta":1,"fn":"validateFontStyleChoice","event":"log","data":{"ignoredInNegativeContext":"Integral CF"}}
+{"ts":"2026-04-25T22:30:14.955Z","delta":0,"fn":"validateFontStyleChoice","event":"log","data":{"hasPositiveDescriptor":true}}
+{"ts":"2026-04-25T22:30:14.955Z","delta":0,"fn":"validateFontStyleChoice","event":"exit","data":{"hasPositiveDescriptor":true}}
+{"ts":"2026-04-25T22:30:14.955Z","delta":0,"fn":"generatePromptFromInputsRaw","event":"exit","data":{"finalPromptLength":2965}}
+{"ts":"2026-04-25T22:30:14.955Z","delta":0,"fn":"generatePromptFromInputs","event":"exit","data":{"attempt":1,"resultLength":2965}}
+{"ts":"2026-04-25T22:30:14.956Z","delta":1,"fn":"runFullPipeline","event":"log","data":{"phase":"PROMPT_READY","promptLength":2965}}
+{"ts":"2026-04-25T22:30:14.969Z","delta":13,"fn":"runFullPipeline","event":"log","data":{"phase":"GENERATING_IMAGE","promptLength":2965}}
+{"ts":"2026-04-25T22:30:14.970Z","delta":1,"fn":"generateImageFromPrompt","event":"enter","data":{"format":"REELS_9_16","promptLength":2965,"baseImageSize":200724}}
+{"ts":"2026-04-25T22:30:14.974Z","delta":4,"fn":"generateImageFromPrompt","event":"log","data":{"phase":"gemini_call","timeout":"120s"}}
+{"ts":"2026-04-25T22:30:14.974Z","delta":0,"fn":"generateImageFromPrompt","event":"http_request","data":{"model":"gemini-2.5-flash-image","promptLength":2965,"responseModalities":{"0":"TEXT","1":"IMAGE"}}}
+{"ts":"2026-04-25T22:30:25.016Z","delta":10042,"fn":"generateImageFromPrompt","event":"http_response","data":{"hasCandidates":true}}
+{"ts":"2026-04-25T22:30:25.021Z","delta":5,"fn":"generateImageFromPrompt","event":"exit","data":{"width":768,"height":1344,"sizeBytes":2310991,"mimeType":"image/png"}}
+{"ts":"2026-04-25T22:30:25.021Z","delta":0,"fn":"runFullPipeline","event":"log","data":{"phase":"IMAGE_READY","sizeBytes":2310991,"width":768,"height":1344}}
+{"ts":"2026-04-25T22:30:25.700Z","delta":679,"fn":"runFullPipeline","event":"exit","data":{"status":"COMPLETED","totalDuration":"24.1s"}}
+{"ts":"2026-04-25T22:30:25.701Z","delta":1,"fn":"POST /api/covers/[id]/generate","event":"exit","data":{"status":200,"success":true}}

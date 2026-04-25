@@ -38,7 +38,7 @@ export default function Step6AccentColor({
         name="accentColor"
         render={({ field }) => (
           <FormItem>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {colors.map(({ hex, label }) => (
                 <button
                   key={hex}
