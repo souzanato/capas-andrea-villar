@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ──────────────────────────────────────────
+
+enum Format {
+  REELS_9_16
+  FEED_1_1
+  CAROUSEL_4_5
+}
+
+enum Status {
+  PENDING
+  GENERATING_PROMPT
+  GENERATING_IMAGE
+  COMPLETED
+  FAILED
+}
+
+enum Role {
+  USER
+  ASSISTANT
+}
+
+// ── Models ─────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  covers Cover[]
+}
+
+model Cover {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  title             String
+  format            Format
+  contentType       String
+  palette           String
+  accentColor       String?
+  customPalette     Json?
+  generatedPrompt   String?  @db.Text
+  status            Status   @default(PENDING)
+  errorMessage      String?
+  metaPromptVersion String   @default("v10")
+
+  // Relação 1:1 opcional com a imagem base enviada pelo usuário
+  baseImageId String? @unique
+  baseImage   Image?  @relation("BaseImage", fields: [baseImageId], references: [id])
+
+  // Relações 1:N
+  generatedImages GeneratedImage[]
+  messages        Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  data      Bytes
+  mimeType  String
+  width     Int
+  height    Int
+  sizeBytes Int
+  createdAt DateTime @default(now())
+
+  baseFor Cover? @relation("BaseImage")
+}
+
+model GeneratedImage {
+  id         String   @id @default(cuid())
+  coverId    String
+  cover      Cover    @relation(fields: [coverId], references: [id], onDelete: Cascade)
+  data       Bytes
+  mimeType   String
+  width      Int
+  height     Int
+  sizeBytes  Int
+  version    Int
+  promptUsed String   @db.Text
+  createdAt  DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  coverId   String
+  cover     Cover    @relation(fields: [coverId], references: [id], onDelete: Cascade)
+  role      Role
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+}

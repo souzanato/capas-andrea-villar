@@ -1,0 +1,45 @@
+{"ts":"2026-04-25T14:15:54.525Z","delta":347,"fn":"POST /api/covers/[id]/generate","event":"enter","data":{"coverId":"cmoef9khq00050z1wrk3gpc4n"}}
+{"ts":"2026-04-25T14:15:54.556Z","delta":31,"fn":"POST /api/covers/[id]/generate","event":"log","data":{"phase":"starting_pipeline","coverId":"cmoef9khq00050z1wrk3gpc4n","status":"PENDING"}}
+{"ts":"2026-04-25T14:15:54.573Z","delta":17,"fn":"runFullPipeline","event":"enter","data":{"coverId":"cmoef9khq00050z1wrk3gpc4n"}}
+{"ts":"2026-04-25T14:15:54.718Z","delta":145,"fn":"runFullPipeline","event":"log","data":{"phase":"GENERATING_PROMPT"}}
+{"ts":"2026-04-25T14:15:54.740Z","delta":22,"fn":"runFullPipeline","event":"log","data":{"phase":"GENERATING_PROMPT","baseImageSize":976117}}
+{"ts":"2026-04-25T14:15:54.741Z","delta":1,"fn":"generatePromptFromInputs","event":"enter","data":{"title":"O que é Matrescência","format":"REELS_9_16"}}
+{"ts":"2026-04-25T14:15:54.743Z","delta":2,"fn":"generatePromptFromInputs","event":"log","data":{"attempt":1,"maxAttempts":3,"lastError":null}}
+{"ts":"2026-04-25T14:15:54.744Z","delta":1,"fn":"generatePromptFromInputsRaw","event":"enter","data":{"title":"O que é Matrescência","format":"REELS_9_16","hasAdditionalInstruction":false}}
+{"ts":"2026-04-25T14:15:54.830Z","delta":86,"fn":"generatePromptFromInputsRaw","event":"http_request","data":{"model":"gpt-4o","temperature":0.4,"max_tokens":4000,"messageLength":2243}}
+{"ts":"2026-04-25T14:16:09.579Z","delta":14749,"fn":"generatePromptFromInputsRaw","event":"http_response","data":{"status":"ok","contentLength":4648,"finishReason":"stop"}}
+{"ts":"2026-04-25T14:16:09.581Z","delta":2,"fn":"validateChecklistPassed","event":"enter","data":{"responseLength":4648}}
+{"ts":"2026-04-25T14:16:09.582Z","delta":1,"fn":"validateChecklistPassed","event":"log","data":{"yesCount":12,"noCount":0}}
+{"ts":"2026-04-25T14:16:09.582Z","delta":0,"fn":"validateChecklistPassed","event":"exit","data":{"yesCount":12}}
+{"ts":"2026-04-25T14:16:09.582Z","delta":0,"fn":"extractOnlyFinalPromptSection","event":"enter","data":{"fullLength":4648}}
+{"ts":"2026-04-25T14:16:09.582Z","delta":0,"fn":"extractOnlyFinalPromptSection","event":"exit","data":{"method":"regex","length":2936}}
+{"ts":"2026-04-25T14:16:09.582Z","delta":0,"fn":"validateExtractedPrompt","event":"enter","data":{"title":"O que é Matrescência","promptLength":2936}}
+{"ts":"2026-04-25T14:16:09.583Z","delta":1,"fn":"validateExtractedPrompt","event":"exit","data":{"uniqueWords":4}}
+{"ts":"2026-04-25T14:16:09.584Z","delta":1,"fn":"validateConnectorPlacement","event":"enter","data":{"sectionLength":2936}}
+{"ts":"2026-04-25T14:16:09.584Z","delta":0,"fn":"validateConnectorPlacement","event":"log","data":{"totalLines":2,"connectorOnlyLines":{"0":"O que é"}}}
+{"ts":"2026-04-25T14:16:09.584Z","delta":0,"fn":"validateConnectorPlacement","event":"exit","data":{"decision":"Line 1 connector-only — valid opening"}}
+{"ts":"2026-04-25T14:16:09.584Z","delta":0,"fn":"validateGeometricBalance","event":"enter"}
+{"ts":"2026-04-25T14:16:09.584Z","delta":0,"fn":"validateGeometricBalance","event":"log","data":{"lines":{"0":"O que é","1":"Matrescência"},"charCounts":{"0":5,"1":12},"diff":"58%"}}
+{"ts":"2026-04-25T14:16:09.584Z","delta":0,"fn":"validateGeometricBalance","event":"exit","data":{"diff":"58%"}}
+{"ts":"2026-04-25T14:16:09.585Z","delta":1,"fn":"validateNoMetadataLeakage","event":"enter"}
+{"ts":"2026-04-25T14:16:09.585Z","delta":0,"fn":"validateNoMetadataLeakage","event":"exit","data":"No leakage detected"}
+{"ts":"2026-04-25T14:16:09.585Z","delta":0,"fn":"validateNoShadowLanguage","event":"enter"}
+{"ts":"2026-04-25T14:16:09.585Z","delta":0,"fn":"validateNoShadowLanguage","event":"exit","data":{"hasIllumination":true}}
+{"ts":"2026-04-25T14:16:09.586Z","delta":1,"fn":"validateFontStyleChoice","event":"enter"}
+{"ts":"2026-04-25T14:16:09.586Z","delta":0,"fn":"validateFontStyleChoice","event":"log","data":{"ignoredInNegativeContext":"Druk Wide"}}
+{"ts":"2026-04-25T14:16:09.586Z","delta":0,"fn":"validateFontStyleChoice","event":"log","data":{"ignoredInNegativeContext":"Druk Wide"}}
+{"ts":"2026-04-25T14:16:09.587Z","delta":1,"fn":"validateFontStyleChoice","event":"log","data":{"ignoredInNegativeContext":"Integral CF"}}
+{"ts":"2026-04-25T14:16:09.587Z","delta":0,"fn":"validateFontStyleChoice","event":"log","data":{"hasPositiveDescriptor":true}}
+{"ts":"2026-04-25T14:16:09.588Z","delta":1,"fn":"validateFontStyleChoice","event":"exit","data":{"hasPositiveDescriptor":true}}
+{"ts":"2026-04-25T14:16:09.588Z","delta":0,"fn":"generatePromptFromInputsRaw","event":"exit","data":{"finalPromptLength":2936}}
+{"ts":"2026-04-25T14:16:09.588Z","delta":0,"fn":"generatePromptFromInputs","event":"exit","data":{"attempt":1,"resultLength":2936}}
+{"ts":"2026-04-25T14:16:09.588Z","delta":0,"fn":"runFullPipeline","event":"log","data":{"phase":"PROMPT_READY","promptLength":2936}}
+{"ts":"2026-04-25T14:16:09.607Z","delta":19,"fn":"runFullPipeline","event":"log","data":{"phase":"GENERATING_IMAGE","promptLength":2936}}
+{"ts":"2026-04-25T14:16:09.608Z","delta":1,"fn":"generateImageFromPrompt","event":"enter","data":{"format":"REELS_9_16","promptLength":2936,"baseImageSize":1301492}}
+{"ts":"2026-04-25T14:16:09.612Z","delta":4,"fn":"generateImageFromPrompt","event":"log","data":{"phase":"gemini_call","timeout":"120s"}}
+{"ts":"2026-04-25T14:16:09.612Z","delta":0,"fn":"generateImageFromPrompt","event":"http_request","data":{"model":"gemini-2.5-flash-image","promptLength":2936,"responseModalities":{"0":"TEXT","1":"IMAGE"}}}
+{"ts":"2026-04-25T14:16:21.262Z","delta":11650,"fn":"generateImageFromPrompt","event":"http_response","data":{"hasCandidates":true}}
+{"ts":"2026-04-25T14:16:21.428Z","delta":166,"fn":"generateImageFromPrompt","event":"exit","data":{"width":768,"height":1344,"sizeBytes":2213033,"mimeType":"image/png"}}
+{"ts":"2026-04-25T14:16:21.429Z","delta":1,"fn":"runFullPipeline","event":"log","data":{"phase":"IMAGE_READY","sizeBytes":2213033,"width":768,"height":1344}}
+{"ts":"2026-04-25T14:16:22.359Z","delta":930,"fn":"runFullPipeline","event":"exit","data":{"status":"COMPLETED","totalDuration":"27.8s"}}
+{"ts":"2026-04-25T14:16:22.360Z","delta":1,"fn":"POST /api/covers/[id]/generate","event":"exit","data":{"status":200,"success":true}}

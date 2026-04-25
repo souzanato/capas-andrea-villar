@@ -1,0 +1,44 @@
+{"ts":"2026-04-25T15:38:54.177Z","delta":1050,"fn":"POST /api/covers/[id]/generate","event":"enter","data":{"coverId":"cmoei89rq00020z2mljr2hf27"}}
+{"ts":"2026-04-25T15:38:54.216Z","delta":39,"fn":"POST /api/covers/[id]/generate","event":"log","data":{"phase":"starting_pipeline","coverId":"cmoei89rq00020z2mljr2hf27","status":"PENDING"}}
+{"ts":"2026-04-25T15:38:54.216Z","delta":0,"fn":"runFullPipeline","event":"enter","data":{"coverId":"cmoei89rq00020z2mljr2hf27"}}
+{"ts":"2026-04-25T15:38:54.222Z","delta":6,"fn":"runFullPipeline","event":"log","data":{"phase":"GENERATING_PROMPT"}}
+{"ts":"2026-04-25T15:38:54.233Z","delta":11,"fn":"runFullPipeline","event":"log","data":{"phase":"GENERATING_PROMPT","baseImageSize":39720}}
+{"ts":"2026-04-25T15:38:54.233Z","delta":0,"fn":"generatePromptFromInputs","event":"enter","data":{"title":"Maternidade não é culpa","format":"REELS_9_16"}}
+{"ts":"2026-04-25T15:38:54.233Z","delta":0,"fn":"generatePromptFromInputs","event":"log","data":{"attempt":1,"maxAttempts":3,"lastError":null}}
+{"ts":"2026-04-25T15:38:54.234Z","delta":1,"fn":"generatePromptFromInputsRaw","event":"enter","data":{"title":"Maternidade não é culpa","format":"REELS_9_16","hasAdditionalInstruction":false}}
+{"ts":"2026-04-25T15:38:54.236Z","delta":2,"fn":"generatePromptFromInputsRaw","event":"http_request","data":{"model":"gpt-4o","temperature":0.4,"max_tokens":4000,"messageLength":2246}}
+{"ts":"2026-04-25T15:39:06.988Z","delta":12752,"fn":"generatePromptFromInputsRaw","event":"http_response","data":{"status":"ok","contentLength":4637,"finishReason":"stop"}}
+{"ts":"2026-04-25T15:39:06.990Z","delta":2,"fn":"validateChecklistPassed","event":"enter","data":{"responseLength":4637}}
+{"ts":"2026-04-25T15:39:06.991Z","delta":1,"fn":"validateChecklistPassed","event":"log","data":{"yesCount":12,"noCount":0}}
+{"ts":"2026-04-25T15:39:06.991Z","delta":0,"fn":"validateChecklistPassed","event":"exit","data":{"yesCount":12}}
+{"ts":"2026-04-25T15:39:06.991Z","delta":0,"fn":"extractOnlyFinalPromptSection","event":"enter","data":{"fullLength":4637}}
+{"ts":"2026-04-25T15:39:06.992Z","delta":1,"fn":"extractOnlyFinalPromptSection","event":"exit","data":{"method":"regex","length":2995}}
+{"ts":"2026-04-25T15:39:06.992Z","delta":0,"fn":"validateExtractedPrompt","event":"enter","data":{"title":"Maternidade não é culpa","promptLength":2995}}
+{"ts":"2026-04-25T15:39:06.993Z","delta":1,"fn":"validateExtractedPrompt","event":"exit","data":{"uniqueWords":4}}
+{"ts":"2026-04-25T15:39:06.993Z","delta":0,"fn":"validateConnectorPlacement","event":"enter","data":{"sectionLength":2995}}
+{"ts":"2026-04-25T15:39:06.993Z","delta":0,"fn":"validateConnectorPlacement","event":"exit","data":{"totalLines":2,"connectorLines":0}}
+{"ts":"2026-04-25T15:39:06.994Z","delta":1,"fn":"validateGeometricBalance","event":"enter"}
+{"ts":"2026-04-25T15:39:06.994Z","delta":0,"fn":"validateGeometricBalance","event":"log","data":{"lines":{"0":"Maternidade","1":"não é culpa"},"charCounts":{"0":11,"1":9},"diff":"18%"}}
+{"ts":"2026-04-25T15:39:06.994Z","delta":0,"fn":"validateGeometricBalance","event":"exit","data":{"diff":"18%"}}
+{"ts":"2026-04-25T15:39:06.994Z","delta":0,"fn":"validateNoMetadataLeakage","event":"enter"}
+{"ts":"2026-04-25T15:39:06.994Z","delta":0,"fn":"validateNoMetadataLeakage","event":"exit","data":"No leakage detected"}
+{"ts":"2026-04-25T15:39:06.995Z","delta":1,"fn":"validateNoShadowLanguage","event":"enter"}
+{"ts":"2026-04-25T15:39:06.995Z","delta":0,"fn":"validateNoShadowLanguage","event":"exit","data":{"hasIllumination":true}}
+{"ts":"2026-04-25T15:39:06.996Z","delta":1,"fn":"validateFontStyleChoice","event":"enter"}
+{"ts":"2026-04-25T15:39:06.996Z","delta":0,"fn":"validateFontStyleChoice","event":"log","data":{"ignoredInNegativeContext":"Druk Wide"}}
+{"ts":"2026-04-25T15:39:06.997Z","delta":1,"fn":"validateFontStyleChoice","event":"log","data":{"ignoredInNegativeContext":"Druk Wide"}}
+{"ts":"2026-04-25T15:39:06.997Z","delta":0,"fn":"validateFontStyleChoice","event":"log","data":{"ignoredInNegativeContext":"Integral CF"}}
+{"ts":"2026-04-25T15:39:06.998Z","delta":1,"fn":"validateFontStyleChoice","event":"log","data":{"hasPositiveDescriptor":true}}
+{"ts":"2026-04-25T15:39:06.998Z","delta":0,"fn":"validateFontStyleChoice","event":"exit","data":{"hasPositiveDescriptor":true}}
+{"ts":"2026-04-25T15:39:06.998Z","delta":0,"fn":"generatePromptFromInputsRaw","event":"exit","data":{"finalPromptLength":2995}}
+{"ts":"2026-04-25T15:39:06.998Z","delta":0,"fn":"generatePromptFromInputs","event":"exit","data":{"attempt":1,"resultLength":2995}}
+{"ts":"2026-04-25T15:39:06.999Z","delta":1,"fn":"runFullPipeline","event":"log","data":{"phase":"PROMPT_READY","promptLength":2995}}
+{"ts":"2026-04-25T15:39:07.021Z","delta":22,"fn":"runFullPipeline","event":"log","data":{"phase":"GENERATING_IMAGE","promptLength":2995}}
+{"ts":"2026-04-25T15:39:07.021Z","delta":0,"fn":"generateImageFromPrompt","event":"enter","data":{"format":"REELS_9_16","promptLength":2995,"baseImageSize":52960}}
+{"ts":"2026-04-25T15:39:07.023Z","delta":2,"fn":"generateImageFromPrompt","event":"log","data":{"phase":"gemini_call","timeout":"120s"}}
+{"ts":"2026-04-25T15:39:07.023Z","delta":0,"fn":"generateImageFromPrompt","event":"http_request","data":{"model":"gemini-2.5-flash-image","promptLength":2995,"responseModalities":{"0":"TEXT","1":"IMAGE"}}}
+{"ts":"2026-04-25T15:39:17.798Z","delta":10775,"fn":"generateImageFromPrompt","event":"http_response","data":{"hasCandidates":true}}
+{"ts":"2026-04-25T15:39:17.806Z","delta":8,"fn":"generateImageFromPrompt","event":"exit","data":{"width":768,"height":1344,"sizeBytes":1860722,"mimeType":"image/png"}}
+{"ts":"2026-04-25T15:39:17.806Z","delta":0,"fn":"runFullPipeline","event":"log","data":{"phase":"IMAGE_READY","sizeBytes":1860722,"width":768,"height":1344}}
+{"ts":"2026-04-25T15:39:18.893Z","delta":1087,"fn":"runFullPipeline","event":"exit","data":{"status":"COMPLETED","totalDuration":"24.7s"}}
+{"ts":"2026-04-25T15:39:18.893Z","delta":0,"fn":"POST /api/covers/[id]/generate","event":"exit","data":{"status":200,"success":true}}
