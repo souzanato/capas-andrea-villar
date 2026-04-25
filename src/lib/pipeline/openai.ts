@@ -238,7 +238,7 @@ function validateExtractedPrompt(extractedPrompt: string, originalTitle: string)
 
   // Pega palavras únicas do título (já sem pontuação)
   const titleWords = titleNormalized.split(/\s+/).filter(Boolean);
-  const uniqueTitleWords = [...new Set(titleWords)];
+  const uniqueTitleWords = Array.from(new Set(titleWords));
 
   // Cada palavra única deve aparecer pelo menos uma vez no prompt normalizado
   for (const word of uniqueTitleWords) {
