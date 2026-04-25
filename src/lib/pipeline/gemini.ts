@@ -1,5 +1,6 @@
 import sharp from "sharp";
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
+import { toFile } from "openai/uploads";
 import { enter, exit, log, error as logError } from "./debug-logger";
 
 // ── Dimensões esperadas por formato ─────────────────
@@ -9,6 +10,16 @@ export const FORMAT_DIMENSIONS = {
   FEED_1_1: { width: 1080, height: 1080 },
   CAROUSEL_4_5: { width: 1080, height: 1350 },
 } as const;
+
+// ── Mapeamento de formato → tamanho aceito pela OpenAI ──
+// OpenAI gpt-image-1.5 só aceita 3 tamanhos: 1024x1024, 1024x1536, 1536x1024
+// Sharp redimensiona depois pra dimensão final do app
+
+const OPENAI_SIZE_BY_FORMAT = {
+  REELS_9_16: "1024x1536" as const,   // portrait 2:3 → redim. 1080x1920
+  FEED_1_1: "1024x1024" as const,     // square → redim. 1080x1080
+  CAROUSEL_4_5: "1024x1536" as const, // portrait 2:3 → redim. 1080x1350
+};
 
 // ── Tipos ──────────────────────────────────────────
 
@@ -29,91 +40,134 @@ export interface GeneratedImageResult {
 // ── Função principal ───────────────────────────────
 
 /**
- * Chama o Gemini (Nano Banana) para gerar/editar a imagem com
+ * Chama o GPT-Image-1.5 (OpenAI) para gerar/editar a imagem com
  * o prompt extraído do GPT + imagem base do usuário.
  *
- * Modelo usado: gemini-2.5-flash-image
- * (Nano Banana — geração/edição nativa de imagens)
+ * Modelo usado: gpt-image-1.5
+ * (Substituiu Gemini 2.5 Flash Image por melhor renderização de
+ *  texto em português — acentos como "â", "ç", "ã" saem corretos)
  */
 export async function generateImageFromPrompt(
   input: ImageGenerationInput
 ): Promise<GeneratedImageResult> {
   const fn = "generateImageFromPrompt";
-  await enter(fn, { format: input.format, promptLength: input.prompt.length, baseImageSize: input.baseImageBase64.length });
+  await enter(fn, {
+    format: input.format,
+    promptLength: input.prompt.length,
+    baseImageSize: input.baseImageBase64.length,
+  });
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    await logError(fn, "GEMINI_API_KEY not configured");
-    throw new Error("GEMINI_API_KEY não configurada.");
+    await logError(fn, "OPENAI_API_KEY not configured");
+    throw new Error("OPENAI_API_KEY não configurada.");
   }
 
-  const ai = new GoogleGenAI({ apiKey });
+  const openai = new OpenAI({ apiKey });
 
-  const GEMINI_TIMEOUT_MS = 120_000;
-  await log(fn, "log", { phase: "gemini_call", timeout: `${GEMINI_TIMEOUT_MS / 1000}s` });
-  await log(fn, "http_request", { model: "gemini-2.5-flash-image", promptLength: input.prompt.length, responseModalities: ["TEXT", "IMAGE"] });
+  const OPENAI_TIMEOUT_MS = 120_000;
+  const targetDimensions = FORMAT_DIMENSIONS[input.format];
+  const openaiSize = OPENAI_SIZE_BY_FORMAT[input.format];
 
-  const geminiPromise = ai.models.generateContent({
-    model: "gemini-2.5-flash-image",
-    contents: [
-      {
-        role: "user",
-        parts: [
-          { text: input.prompt },
-          {
-            inlineData: {
-              mimeType: input.baseImageMimeType,
-              data: input.baseImageBase64,
-            },
-          },
-        ],
-      },
-    ],
-    config: {
-      responseModalities: ["TEXT", "IMAGE"],
-    },
+  // ── Prepara imagem base como PNG (OpenAI exige PNG/WEBP/JPG) ──
+
+  await log(fn, "log", { phase: "prepare_image", inputMime: input.baseImageMimeType });
+
+  const baseBuffer = Buffer.from(input.baseImageBase64, "base64");
+
+  // Converte pra PNG e garante tamanho razoável (≤50MB exigido pela OpenAI;
+  // limitamos a 4MB pra rapidez de upload)
+  const pngBuffer = await sharp(baseBuffer)
+    .resize(2048, 2048, { fit: "inside", withoutEnlargement: true })
+    .png()
+    .toBuffer();
+
+  await log(fn, "log", {
+    phase: "image_ready",
+    originalSize: baseBuffer.length,
+    pngSize: pngBuffer.length,
   });
+
+  // ── Chama OpenAI Images Edit ─────────────────────
+
+  await log(fn, "log", { phase: "openai_call", timeout: `${OPENAI_TIMEOUT_MS / 1000}s` });
+  await log(fn, "http_request", {
+    model: "gpt-image-1.5",
+    promptLength: input.prompt.length,
+    size: openaiSize,
+    quality: "high",
+    input_fidelity: "high",
+  });
+
+  const imageFile = await toFile(pngBuffer, "base.png", { type: "image/png" });
+
+  const openaiPromise = openai.images.edit({
+    model: "gpt-image-1.5",
+    image: imageFile,
+    prompt: input.prompt,
+    size: openaiSize,
+    quality: "high",
+    input_fidelity: "high",  // ← preserva rosto, pose, ambiente
+    n: 1,
+  } as any);
 
   const timeoutPromise = new Promise<never>((_resolve, reject) => {
     setTimeout(
-      () => reject(new Error(`Gemini request timed out after ${GEMINI_TIMEOUT_MS / 1000}s`)),
-      GEMINI_TIMEOUT_MS
+      () => reject(new Error(`OpenAI Images request timed out after ${OPENAI_TIMEOUT_MS / 1000}s`)),
+      OPENAI_TIMEOUT_MS
     );
   });
 
-  const response = await Promise.race([geminiPromise, timeoutPromise]);
+  const response = await Promise.race([openaiPromise, timeoutPromise]);
 
-  await log(fn, "http_response", { hasCandidates: !!response.candidates?.length });
+  await log(fn, "http_response", {
+    hasData: !!response.data?.length,
+    dataCount: response.data?.length ?? 0,
+  });
 
-  const candidate = response.candidates?.[0];
+  const imageData = response.data?.[0];
 
-  if (!candidate) {
-    await logError(fn, "No candidates in response");
-    throw new Error("Gemini não retornou candidatos na resposta.");
-  }
-
-  const imagePart = candidate.content?.parts?.find(
-    (p) => p.inlineData
-  );
-
-  if (!imagePart?.inlineData) {
-    await logError(fn, "No image in Gemini response", { textParts: candidate.content?.parts?.filter(p => p.text).map(p => p.text?.substring(0, 100)) });
+  if (!imageData?.b64_json) {
+    await logError(fn, "No image in OpenAI response", {
+      response: JSON.stringify(response).substring(0, 500),
+    });
     throw new Error(
-      "Gemini não retornou imagem na resposta. Verifique se o modelo suporta geração de imagem."
+      "OpenAI não retornou imagem na resposta. Verifique se sua organização tem acesso ao gpt-image-1.5 (pode exigir verificação em platform.openai.com/account/organization)."
     );
   }
 
-  const base64Data = imagePart.inlineData.data!;
-  const buffer = Buffer.from(base64Data, "base64");
-  const metadata = await sharp(buffer).metadata();
+  const generatedBuffer = Buffer.from(imageData.b64_json, "base64");
 
-  await exit(fn, { width: metadata.width, height: metadata.height, sizeBytes: buffer.length, mimeType: imagePart.inlineData.mimeType });
+  // ── Redimensiona pro tamanho final do formato ──
+
+  await log(fn, "log", {
+    phase: "resize_to_target",
+    from: openaiSize,
+    to: `${targetDimensions.width}x${targetDimensions.height}`,
+  });
+
+  const finalBuffer = await sharp(generatedBuffer)
+    .resize(targetDimensions.width, targetDimensions.height, {
+      fit: "cover",
+      position: "center",
+    })
+    .png()
+    .toBuffer();
+
+  const metadata = await sharp(finalBuffer).metadata();
+
+  await exit(fn, {
+    width: metadata.width,
+    height: metadata.height,
+    sizeBytes: finalBuffer.length,
+    mimeType: "image/png",
+  });
 
   return {
-    data: buffer,
-    mimeType: imagePart.inlineData.mimeType ?? "image/png",
-    width: metadata.width ?? FORMAT_DIMENSIONS[input.format].width,
-    height: metadata.height ?? FORMAT_DIMENSIONS[input.format].height,
+    data: finalBuffer,
+    mimeType: "image/png",
+    width: metadata.width ?? targetDimensions.width,
+    height: metadata.height ?? targetDimensions.height,
   };
 }

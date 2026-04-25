@@ -6,7 +6,7 @@ import { enter, exit, log, error as logError, errorSync, logSync } from "./debug
 /**
  * Executa o pipeline completo para uma capa:
  *   1. Gera o prompt via GPT-4o
- *   2. Gera a imagem via Gemini (Nano Banana)
+ *   2. Gera a imagem via GPT-Image-1.5 (OpenAI)
  *   3. Salva GeneratedImage no banco
  *   4. Atualiza status para COMPLETED (ou FAILED em caso de erro)
  */
