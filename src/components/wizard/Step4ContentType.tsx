@@ -56,7 +56,7 @@ export default function Step4ContentType() {
         name="contentType"
         render={({ field }) => (
           <FormItem>
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
               {CONTENT_TYPES.map((type) => (
                 <button
                   key={type}

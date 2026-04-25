@@ -52,7 +52,7 @@ export default function Step3Format() {
                   type="button"
                   onClick={() => field.onChange(fmt.value)}
                   className={cn(
-                    "flex flex-col items-center gap-3 rounded-lg border p-4 transition-all",
+                    "flex flex-col items-center gap-3 rounded-lg border p-3 sm:p-4 transition-all",
                     field.value === fmt.value
                       ? "border-primary ring-2 ring-primary/20 bg-primary/5"
                       : "border-border hover:border-muted-foreground/50"

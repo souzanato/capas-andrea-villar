@@ -45,14 +45,14 @@ export default function Step6AccentColor({
                   type="button"
                   onClick={() => field.onChange(hex)}
                   className={cn(
-                    "flex flex-col items-center gap-3 rounded-lg border p-6 transition-all",
+                    "flex flex-col items-center gap-3 rounded-lg border p-4 sm:p-6 transition-all",
                     field.value === hex
                       ? "border-primary ring-2 ring-primary/20"
                       : "border-border hover:border-muted-foreground/50"
                   )}
                 >
                   <div
-                    className="h-16 w-16 rounded-full border-2 border-border shadow-sm"
+                    className="h-12 w-12 sm:h-16 sm:w-16 rounded-full border-2 border-border shadow-sm"
                     style={{ backgroundColor: hex }}
                   />
                   <div className="text-center">

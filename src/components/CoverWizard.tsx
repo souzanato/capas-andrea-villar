@@ -222,7 +222,7 @@ export default function CoverWizard() {
         </div>
 
         {/* Card do formulário com fundo branco */}
-        <div className="bg-background-elevated rounded-xl p-8 border border-border">
+        <div className="bg-background-elevated rounded-xl p-4 sm:p-8 border border-border">
         {/* Steps */}
         {step === 1 && <Step1Title />}
         {step === 2 && (
