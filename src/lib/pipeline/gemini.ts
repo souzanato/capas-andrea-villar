@@ -102,7 +102,7 @@ export async function generateImageFromPrompt(
 
   const imageFile = await toFile(pngBuffer, "base.png", { type: "image/png" });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const openaiPromise = openai.images.edit({
     model: "gpt-image-1.5",
     image: imageFile,
@@ -112,6 +112,7 @@ export async function generateImageFromPrompt(
     input_fidelity: "high",  // ← preserva rosto, pose, ambiente
     n: 1,
   } as any);
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   const timeoutPromise = new Promise<never>((_resolve, reject) => {
     setTimeout(
