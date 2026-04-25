@@ -98,6 +98,7 @@ export default function CoverDetail({ cover }: CoverDetailProps) {
           currentVersion={currentVersion}
           onVersionChange={setCurrentVersion}
           generatedPrompt={cover.generatedPrompt}
+          isProcessing={isProcessing}
         />
       </div>
 

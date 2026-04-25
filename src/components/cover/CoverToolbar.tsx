@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Download, Copy, Trash2, ChevronDown } from "lucide-react";
+import { Download, Copy, Trash2, ChevronDown, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -34,6 +34,7 @@ interface CoverToolbarProps {
   currentVersion: number;
   onVersionChange: (version: number) => void;
   generatedPrompt: string | null;
+  isProcessing?: boolean;
 }
 
 export default function CoverToolbar({
@@ -43,10 +44,12 @@ export default function CoverToolbar({
   currentVersion,
   onVersionChange,
   generatedPrompt,
+  isProcessing = false,
 }: CoverToolbarProps) {
   const router = useRouter();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
 
   async function handleDownload() {
     try {
@@ -76,6 +79,26 @@ export default function CoverToolbar({
       toast.success("Prompt copiado!");
     } catch {
       toast.error("Erro ao copiar prompt");
+    }
+  }
+
+  async function handleRegenerate() {
+    setRegenerating(true);
+    try {
+      const res = await fetch(`/api/covers/${coverId}/regenerate`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Erro ao regenerar");
+      }
+      toast.success("Regenerando capa...");
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao regenerar capa"
+      );
+      setRegenerating(false);
     }
   }
 
@@ -139,6 +162,18 @@ export default function CoverToolbar({
           Copiar prompt
         </Button>
       )}
+
+      {/* Regenerar */}
+      <Button
+        variant="default"
+        size="sm"
+        className="gap-1"
+        onClick={handleRegenerate}
+        disabled={regenerating || isProcessing}
+      >
+        <RefreshCw className={`h-4 w-4 ${regenerating ? "animate-spin" : ""}`} />
+        {regenerating ? "Regenerando..." : "Gerar novamente"}
+      </Button>
 
       {/* Excluir */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
