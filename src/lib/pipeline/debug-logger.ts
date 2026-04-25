@@ -1,4 +1,4 @@
-import { appendFile, mkdir } from "fs/promises";
+import { appendFile } from "fs/promises";
 import path from "path";
 import { existsSync, mkdirSync, appendFileSync } from "fs";
 

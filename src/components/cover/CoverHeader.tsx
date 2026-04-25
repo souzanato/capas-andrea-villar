@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CoverStatusBadge } from "./CoverStatusBadge";
+import type { Status } from "@prisma/client";
 
 interface CoverHeaderProps {
   title: string;
@@ -28,7 +29,7 @@ export default function CoverHeader({
       {/* Title + Status */}
       <div className="flex items-start justify-between gap-4">
         <h1 className="text-2xl font-medium tracking-tight break-words flex-1">{title}</h1>
-        <CoverStatusBadge status={status as any} />
+        <CoverStatusBadge status={status as Status} />
       </div>
 
       <p className="text-xs text-foreground-soft">

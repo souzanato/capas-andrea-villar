@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { loadMetaPrompt } from "./meta-prompt";
-import { enter, exit, log, error as logError, logSync, errorSync } from "./debug-logger";
+import { enter, exit, log, logSync, errorSync } from "./debug-logger";
 
 // ── Tipos e constantes ──────────────────────────────
 
@@ -21,6 +21,7 @@ export const CHECKLIST_REQUIRED_YES_COUNT = 12;
 // ── Helpers ────────────────────────────────────────
 
 function getAccentColorName(accentHex: string | null, _palette: string): string {
+  void _palette;
   if (!accentHex) return 'soft pastel pink';
 
   // Cores conhecidas da paleta (prioritário)
@@ -255,12 +256,6 @@ function validateExtractedPrompt(extractedPrompt: string, originalTitle: string)
 
   logSync(fn, "exit", { uniqueWords: uniqueTitleWords.length });
 }
-
-const CONNECTORS = [
-  "não", "é", "num", "numa", "de", "da", "do", "das", "dos",
-  "em", "na", "no", "nas", "nos", "a", "o", "as", "os",
-  "um", "uma", "umas", "uns", "e", "mas", "ou", "que",
-];
 
 function validateChecklistPassed(gptResponse: string): void {
   const fn = "validateChecklistPassed";

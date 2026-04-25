@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { CoverStatusBadge } from "@/components/cover/CoverStatusBadge";
+import type { Status } from "@prisma/client";
 
 const ASPECT_MAP: Record<string, string> = {
   REELS_9_16: "aspect-[9/16]",
@@ -133,7 +134,7 @@ export default function CoverCard({ cover }: CoverCardProps) {
         )}
 
         {/* Status badge */}
-        <CoverStatusBadge status={cover.status as any} size="sm" className="absolute top-2 left-2" />
+        <CoverStatusBadge status={cover.status as Status} size="sm" className="absolute top-2 left-2" />
 
         {/* Actions menu */}
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
