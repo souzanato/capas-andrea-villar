@@ -53,12 +53,17 @@ export default function RefinementChat({
     setLocalMessages(initialMessages);
   }, [initialMessages]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom (apenas quando novas mensagens aparecem, não no inicial)
+  const isFirstRender = useRef(true);
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     scrollToBottom();
   }, [localMessages, scrollToBottom]);
 
