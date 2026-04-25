@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Send, User, Sparkles, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,19 +53,7 @@ export default function RefinementChat({
     setLocalMessages(initialMessages);
   }, [initialMessages]);
 
-  // Auto-scroll to bottom (apenas quando novas mensagens aparecem, não no inicial)
-  const isFirstRender = useRef(true);
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    scrollToBottom();
-  }, [localMessages, scrollToBottom]);
+  // Scroll manual do usuário — sem auto-scroll automático
 
   // Auto-resize textarea
   function handleTextareaChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
