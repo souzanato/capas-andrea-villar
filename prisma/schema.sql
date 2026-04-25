@@ -96,13 +96,3 @@ ALTER TABLE "GeneratedImage" ADD CONSTRAINT "GeneratedImage_coverId_fkey" FOREIG
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_coverId_fkey" FOREIGN KEY ("coverId") REFERENCES "Cover"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-┌─────────────────────────────────────────────────────────┐
-│  Update available 6.6.0 -> 7.8.0                        │
-│                                                         │
-│  This is a major update - please follow the guide at    │
-│  https://pris.ly/d/major-version-upgrade                │
-│                                                         │
-│  Run the following to update                            │
-│    npm i --save-dev prisma@latest                       │
-│    npm i @prisma/client@latest                          │
-└─────────────────────────────────────────────────────────┘
