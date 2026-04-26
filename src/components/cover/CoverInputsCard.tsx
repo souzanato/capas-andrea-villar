@@ -18,8 +18,6 @@ import {
 interface CoverInputsCardProps {
   title: string;
   format: string;
-  contentType: string;
-  palette: string;
   accentColor: string | null;
   baseImage: {
     id: string;
@@ -38,8 +36,6 @@ const FORMAT_LABELS: Record<string, string> = {
 export default function CoverInputsCard({
   title,
   format,
-  contentType,
-  palette,
   accentColor,
   baseImage,
 }: CoverInputsCardProps) {
@@ -70,14 +66,6 @@ export default function CoverInputsCard({
               <span className="font-medium">
                 {FORMAT_LABELS[format] ?? format}
               </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tipo</span>
-              <span className="font-medium capitalize">{contentType}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Paleta</span>
-              <span className="font-medium">{palette}</span>
             </div>
             {accentColor && (
               <div className="flex justify-between items-center">

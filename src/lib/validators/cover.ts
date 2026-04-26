@@ -8,27 +8,6 @@ export const FORMAT_LABELS: Record<string, string> = {
   CAROUSEL_4_5: "4:5 — Carrossel",
 };
 
-export const CONTENT_TYPES = [
-  "maternidade",
-  "podcast",
-  "motivacional",
-  "educacional",
-  "noticia",
-  "vendas",
-  "religioso",
-  "esportes",
-  "humor",
-  "outro",
-] as const;
-
-export const PALETTES = ["andrea", "viral_classic", "custom"] as const;
-
-export const PALETTE_SWATCHES: Record<string, string[]> = {
-  andrea: ["#C8644D", "#1F4E8C", "#2D7A6E"],
-  viral_classic: ["#FFE500", "#FFFFFF"],
-  custom: [],
-};
-
 export const ACCENT_COLORS_ANDREA = [
   { hex: "#C8644D", label: "Emocional, acolhedor" },
   { hex: "#1F4E8C", label: "Calma, reflexão" },
@@ -41,11 +20,10 @@ export const coverFormSchema = z.object({
     .min(3, "Mínimo de 3 caracteres")
     .max(100, "Máximo de 100 caracteres"),
   format: z.enum(FORMAT_VALUES),
-  contentType: z.string().min(1, "Selecione um tipo de conteúdo"),
-  customContentType: z.string().optional(),
-  palette: z.string().min(1, "Selecione uma paleta"),
-  customPalette: z.string().optional(),
-  accentColor: z.string().optional(),
+  accentColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "Cor inválida")
+    .min(1, "Selecione uma cor de destaque"),
 });
 
 export type CoverFormData = z.infer<typeof coverFormSchema>;

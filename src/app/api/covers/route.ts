@@ -87,25 +87,14 @@ export async function POST(request: NextRequest) {
 
     const title = formData.get("title") as string;
     const format = formData.get("format") as string;
-    const contentType = formData.get("contentType") as string;
-    const palette = formData.get("palette") as string;
     const accentColor = formData.get("accentColor") as string | null;
-    const customPaletteStr = formData.get("customPalette") as string | null;
     const imageFile = formData.get("imageFile") as File | null;
 
     // Validação dos campos de texto
     const parsed = coverFormSchema.safeParse({
       title,
       format,
-      contentType:
-        !["maternidade","podcast","motivacional","educacional","noticia","vendas","religioso","esportes","humor","outro"].includes(
-          contentType
-        )
-          ? "outro"
-          : contentType,
-      palette,
       accentColor: accentColor || undefined,
-      customPalette: palette === "custom" ? customPaletteStr : undefined,
     });
 
     if (!parsed.success) {
@@ -160,25 +149,17 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      const customPalette = customPaletteStr
-        ? customPaletteStr
-            .split(",")
-            .map((s) => s.trim())
-            .filter((s) => /^#[0-9A-Fa-f]{6}$/.test(s))
-        : undefined;
-
       return tx.cover.create({
         data: {
           userId: session.user.id,
           title: parsed.data.title,
           format: parsed.data.format,
-          contentType: parsed.data.contentType,
-          palette: parsed.data.palette,
-          accentColor: parsed.data.accentColor || null,
-          ...(customPalette ? { customPalette } : {}),
+          contentType: "maternidade",      // valor fixo (campo legado)
+          palette: "andrea",                // valor fixo (campo legado)
+          accentColor: parsed.data.accentColor,
           baseImageId: image.id,
           status: "PENDING",
-          metaPromptVersion: "v10",
+          metaPromptVersion: "v1-simple",
         },
       });
     });

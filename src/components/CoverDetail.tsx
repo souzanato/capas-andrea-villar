@@ -6,7 +6,6 @@ import CoverImage from "@/components/cover/CoverImage";
 import CoverToolbar from "@/components/cover/CoverToolbar";
 import CoverInputsCard from "@/components/cover/CoverInputsCard";
 import CoverPromptCard from "@/components/cover/CoverPromptCard";
-import RefinementChat from "@/components/cover/RefinementChat";
 
 interface CoverDetailGeneratedImage {
   version: number;
@@ -19,13 +18,6 @@ interface CoverDetailBaseImage {
   width: number;
   height: number;
   mimeType: string;
-}
-
-interface CoverDetailMessage {
-  id: string;
-  role: string;
-  content: string;
-  createdAt: string;
 }
 
 interface CoverDetailProps {
@@ -41,7 +33,6 @@ interface CoverDetailProps {
     generatedPrompt: string | null;
     baseImage: CoverDetailBaseImage | null;
     generatedImages: CoverDetailGeneratedImage[];
-    messages: CoverDetailMessage[];
   };
 }
 
@@ -107,16 +98,8 @@ export default function CoverDetail({ cover }: CoverDetailProps) {
         <CoverInputsCard
           title={cover.title}
           format={cover.format}
-          contentType={cover.contentType}
-          palette={cover.palette}
           accentColor={cover.accentColor}
           baseImage={cover.baseImage}
-        />
-
-        <RefinementChat
-          coverId={cover.id}
-          initialMessages={cover.messages}
-          isProcessing={isProcessing}
         />
 
         {cover.generatedPrompt && (

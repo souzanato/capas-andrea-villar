@@ -10,19 +10,8 @@ import {
 import type { CoverFormData } from "@/lib/validators/cover";
 import { ACCENT_COLORS_ANDREA } from "@/lib/validators/cover";
 
-interface Step6AccentColorProps {
-  customColors?: string[];
-}
-
-export default function Step6AccentColor({
-  customColors,
-}: Step6AccentColorProps) {
+export default function Step6AccentColor() {
   const { control } = useFormContext<CoverFormData>();
-
-  const colors =
-    customColors && customColors.length >= 2
-      ? customColors.map((hex) => ({ hex, label: hex }))
-      : ACCENT_COLORS_ANDREA;
 
   return (
     <div className="space-y-6">
@@ -39,7 +28,7 @@ export default function Step6AccentColor({
         render={({ field }) => (
           <FormItem>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {colors.map(({ hex, label }) => (
+              {ACCENT_COLORS_ANDREA.map(({ hex, label }) => (
                 <button
                   key={hex}
                   type="button"

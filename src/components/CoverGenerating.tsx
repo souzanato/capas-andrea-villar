@@ -12,18 +12,14 @@ const PHASE_MESSAGES: Partial<Record<Status, { primary: string; secondary: strin
     primary: "Preparando sua capa",
     secondary: "Iniciando o pipeline editorial",
   },
-  GENERATING_PROMPT: {
-    primary: "Definindo a tipografia",
-    secondary: "Calibrando hierarquia, fontes e proporções",
-  },
   GENERATING_IMAGE: {
     primary: "Compondo a capa",
-    secondary: "Aplicando o glow e integrando à foto",
+    secondary: "Aplicando os toques finais",
   },
 };
 
 export default function CoverGenerating({ status }: CoverGeneratingProps) {
-  const message = PHASE_MESSAGES[status] ?? PHASE_MESSAGES.GENERATING_PROMPT!;
+  const message = PHASE_MESSAGES[status] ?? PHASE_MESSAGES.GENERATING_IMAGE!;
 
   return (
     <div className="flex flex-col items-center justify-center py-20 px-4">

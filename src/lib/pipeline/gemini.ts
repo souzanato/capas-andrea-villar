@@ -1,9 +1,11 @@
 import sharp from "sharp";
 import OpenAI from "openai";
 import { toFile } from "openai/uploads";
+import { readFile } from "fs/promises";
+import path from "path";
 import { enter, exit, log, error as logError } from "./debug-logger";
 
-// ── Dimensões esperadas por formato ─────────────────
+// ── Dimensões finais por formato ─────────────────
 
 export const FORMAT_DIMENSIONS = {
   REELS_9_16: { width: 1080, height: 1920 },
@@ -11,23 +13,47 @@ export const FORMAT_DIMENSIONS = {
   CAROUSEL_4_5: { width: 1080, height: 1350 },
 } as const;
 
-// ── Mapeamento de formato → tamanho aceito pela OpenAI ──
-// OpenAI gpt-image-1.5 só aceita 3 tamanhos: 1024x1024, 1024x1536, 1536x1024
-// Sharp redimensiona depois pra dimensão final do app
+// ── Tamanho aceito pela OpenAI Images por formato ──
 
 const OPENAI_SIZE_BY_FORMAT = {
-  REELS_9_16: "1024x1536" as const,   // portrait 2:3 → redim. 1080x1920
-  FEED_1_1: "1024x1024" as const,     // square → redim. 1080x1080
-  CAROUSEL_4_5: "1024x1536" as const, // portrait 2:3 → redim. 1080x1350
+  REELS_9_16: "1024x1536" as const,
+  FEED_1_1: "1024x1024" as const,
+  CAROUSEL_4_5: "1024x1536" as const,
 };
+
+// ── Descrição de formato pra injetar no prompt ─────
+
+const FORMAT_DESC_BY_FORMAT = {
+  REELS_9_16: "9:16 vertical Instagram/Reels",
+  FEED_1_1: "1:1 square Instagram feed",
+  CAROUSEL_4_5: "4:5 portrait Instagram carousel",
+};
+
+// ── Mapeamento hex → nome de cor descritivo ────────
+//
+// Pra o GPT-Image entender melhor o tom desejado, passamos
+// um descritor visual ANTES do hex, em vez de só o hex.
+
+const ACCENT_COLOR_NAMES: Record<string, string> = {
+  "#C8644D": "warm terracotta red",
+  "#1F4E8C": "rich blue",
+  "#2D7A6E": "deep sage green",
+};
+
+function resolveAccentName(hex: string | null | undefined): string {
+  if (!hex) return "rich blue";
+  const upper = hex.toUpperCase();
+  return ACCENT_COLOR_NAMES[upper] ?? "the brand accent color";
+}
 
 // ── Tipos ──────────────────────────────────────────
 
 export interface ImageGenerationInput {
-  prompt: string;
+  title: string;
+  accentColor: string | null;
+  format: "REELS_9_16" | "FEED_1_1" | "CAROUSEL_4_5";
   baseImageBase64: string;
   baseImageMimeType: string;
-  format: "REELS_9_16" | "FEED_1_1" | "CAROUSEL_4_5";
 }
 
 export interface GeneratedImageResult {
@@ -35,49 +61,75 @@ export interface GeneratedImageResult {
   mimeType: string;
   width: number;
   height: number;
+  promptUsed: string;
+}
+
+// ── Carrega o template de prompt do disco (com cache) ──
+
+let cachedPromptTemplate: string | null = null;
+
+async function loadPromptTemplate(): Promise<string> {
+  if (cachedPromptTemplate) return cachedPromptTemplate;
+
+  const promptPath = path.join(process.cwd(), "prompts", "cover-prompt-v1.md");
+  const content = await readFile(promptPath, "utf-8");
+  cachedPromptTemplate = content;
+  return content;
+}
+
+function buildPrompt(
+  template: string,
+  title: string,
+  accentHex: string,
+  format: keyof typeof FORMAT_DESC_BY_FORMAT
+): string {
+  const accentName = resolveAccentName(accentHex);
+  const formatDesc = FORMAT_DESC_BY_FORMAT[format];
+
+  return template
+    .replaceAll("[TITLE]", title)
+    .replaceAll("[ACCENT_NAME]", accentName)
+    .replaceAll("[ACCENT_HEX]", accentHex)
+    .replaceAll("[FORMAT_DESC]", formatDesc);
 }
 
 // ── Função principal ───────────────────────────────
 
 /**
- * Chama o GPT-Image-1.5 (OpenAI) para gerar/editar a imagem com
- * o prompt extraído do GPT + imagem base do usuário.
+ * Gera a imagem final da capa diretamente via GPT-Image-1.5,
+ * sem etapa intermediária de GPT-4o.
  *
- * Modelo usado: gpt-image-1.5
- * (Substituiu Gemini 2.5 Flash Image por melhor renderização de
- *  texto em português — acentos como "â", "ç", "ã" saem corretos)
+ * O prompt vem do template fixo em prompts/cover-prompt-v1.md,
+ * com [TITLE], [ACCENT_NAME], [ACCENT_HEX] e [FORMAT_DESC] substituídos.
  */
 export async function generateImageFromPrompt(
   input: ImageGenerationInput
 ): Promise<GeneratedImageResult> {
   const fn = "generateImageFromPrompt";
   await enter(fn, {
+    title: input.title,
+    accentColor: input.accentColor,
     format: input.format,
-    promptLength: input.prompt.length,
     baseImageSize: input.baseImageBase64.length,
   });
 
   const apiKey = process.env.OPENAI_API_KEY;
-
   if (!apiKey) {
     await logError(fn, "OPENAI_API_KEY not configured");
     throw new Error("OPENAI_API_KEY não configurada.");
   }
 
-  const openai = new OpenAI({ apiKey });
+  // ── 1. Monta o prompt ────────────────────────────
 
-  const OPENAI_TIMEOUT_MS = 120_000;
-  const targetDimensions = FORMAT_DIMENSIONS[input.format];
-  const openaiSize = OPENAI_SIZE_BY_FORMAT[input.format];
+  const template = await loadPromptTemplate();
+  const accentHex = input.accentColor ?? "#1F4E8C";
+  const finalPrompt = buildPrompt(template, input.title, accentHex, input.format);
 
-  // ── Prepara imagem base como PNG (OpenAI exige PNG/WEBP/JPG) ──
+  await log(fn, "log", { phase: "prompt_ready", promptLength: finalPrompt.length });
 
-  await log(fn, "log", { phase: "prepare_image", inputMime: input.baseImageMimeType });
+  // ── 2. Prepara imagem base como PNG ──────────────
 
   const baseBuffer = Buffer.from(input.baseImageBase64, "base64");
-
-  // Converte pra PNG e garante tamanho razoável (≤50MB exigido pela OpenAI;
-  // limitamos a 4MB pra rapidez de upload)
   const pngBuffer = await sharp(baseBuffer)
     .resize(2048, 2048, { fit: "inside", withoutEnlargement: true })
     .png()
@@ -89,14 +141,18 @@ export async function generateImageFromPrompt(
     pngSize: pngBuffer.length,
   });
 
-  // ── Chama OpenAI Images Edit ─────────────────────
+  // ── 3. Chama OpenAI Images Edit ──────────────────
 
-  await log(fn, "log", { phase: "openai_call", timeout: `${OPENAI_TIMEOUT_MS / 1000}s` });
+  const openai = new OpenAI({ apiKey });
+  const targetDimensions = FORMAT_DIMENSIONS[input.format];
+  const openaiSize = OPENAI_SIZE_BY_FORMAT[input.format];
+  const OPENAI_TIMEOUT_MS = 120_000;
+
   await log(fn, "http_request", {
     model: "gpt-image-1.5",
-    promptLength: input.prompt.length,
+    promptLength: finalPrompt.length,
     size: openaiSize,
-    quality: "high",
+    quality: "low",
     input_fidelity: "high",
   });
 
@@ -106,10 +162,10 @@ export async function generateImageFromPrompt(
   const openaiPromise = openai.images.edit({
     model: "gpt-image-1.5",
     image: imageFile,
-    prompt: input.prompt,
+    prompt: finalPrompt,
     size: openaiSize,
     quality: "high",
-    input_fidelity: "high",  // ← preserva rosto, pose, ambiente
+    input_fidelity: "high",
     n: 1,
   } as any);
   /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -129,25 +185,18 @@ export async function generateImageFromPrompt(
   });
 
   const imageData = response.data?.[0];
-
   if (!imageData?.b64_json) {
     await logError(fn, "No image in OpenAI response", {
       response: JSON.stringify(response).substring(0, 500),
     });
     throw new Error(
-      "OpenAI não retornou imagem na resposta. Verifique se sua organização tem acesso ao gpt-image-1.5 (pode exigir verificação em platform.openai.com/account/organization)."
+      "OpenAI não retornou imagem na resposta. Verifique se sua organização tem acesso ao gpt-image-1.5."
     );
   }
 
   const generatedBuffer = Buffer.from(imageData.b64_json, "base64");
 
-  // ── Redimensiona pro tamanho final do formato ──
-
-  await log(fn, "log", {
-    phase: "resize_to_target",
-    from: openaiSize,
-    to: `${targetDimensions.width}x${targetDimensions.height}`,
-  });
+  // ── 4. Redimensiona pro tamanho final ────────────
 
   const finalBuffer = await sharp(generatedBuffer)
     .resize(targetDimensions.width, targetDimensions.height, {
@@ -163,7 +212,6 @@ export async function generateImageFromPrompt(
     width: metadata.width,
     height: metadata.height,
     sizeBytes: finalBuffer.length,
-    mimeType: "image/png",
   });
 
   return {
@@ -171,5 +219,6 @@ export async function generateImageFromPrompt(
     mimeType: "image/png",
     width: metadata.width ?? targetDimensions.width,
     height: metadata.height ?? targetDimensions.height,
+    promptUsed: finalPrompt,
   };
 }
