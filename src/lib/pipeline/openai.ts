@@ -431,26 +431,6 @@ function validateNoShadowLanguage(finalPromptSection: string): void {
   const fn = "validateNoShadowLanguage";
   logSync(fn, "enter");
 
-  // Helper: verifica se uma posição da string está dentro de um contexto negativo
-  function isInNegativeContext(text: string, matchIndex: number): boolean {
-    // Olha 30 caracteres antes do match
-    const before = text.substring(Math.max(0, matchIndex - 30), matchIndex).toLowerCase();
-
-    // Padrões de negação
-    const negationPatterns = [
-      /\bno\s+$/,
-      /\bnot\s+$/,
-      /\bnever\s+$/,
-      /\bwithout\s+(?:any\s+|a\s+)?$/,
-      /\bisn'?t\s+(?:a\s+)?$/,
-      /\bdoesn'?t\s+(?:cast\s+|have\s+|use\s+|create\s+)?(?:a\s+|any\s+)?$/,
-      /\bdo\s+not\s+(?:cast\s+|use\s+|have\s+)?(?:a\s+|any\s+)?$/,
-      /\bavoid\s+(?:any\s+|a\s+)?$/,
-    ];
-
-    return negationPatterns.some(p => p.test(before));
-  }
-
   // Termos potencialmente problemáticos (context-aware)
   const problematicTerms = [
     /\bdrop shadow\b/gi,
@@ -490,19 +470,68 @@ function validateNoShadowLanguage(finalPromptSection: string): void {
     }
   }
 
-  // Validação positiva: deve mencionar backlight/glow/halo/illuminated
-  const positivePatterns = [/\bbacklight\b/i, /\bglow\b/i, /\bhalo\b/i, /\billuminated\b/i];
-  const hasIllumination = positivePatterns.some(p => p.test(finalPromptSection));
+  // Termos PROIBIDOS — glow, halo etc geram efeitos amateurs no GPT-Image-1.5
+  const forbiddenGlowPatterns = [
+    { pattern: /\bbacklight\s+glow\b/i, name: "backlight glow" },
+    { pattern: /\bhalo\b/i, name: "halo" },
+    { pattern: /\billuminated\s+from\s+behind\b/i, name: "illuminated from behind" },
+    { pattern: /\bwarm\s+(halo|glow|light|spill)\b/i, name: "warm light effect" },
+    { pattern: /\bsoft\s+glow\b/i, name: "soft glow" },
+    { pattern: /\bluminous\b/i, name: "luminous" },
+  ];
 
-  if (!hasIllumination) {
-    errorSync(fn, "Missing backlight/glow/halo/illuminated in prompt");
+  // Função helper de contexto negativo (mesma lógica usada em validateFontStyleChoice)
+  function isInNegativeContext(text: string, matchIndex: number): boolean {
+    const before = text.substring(Math.max(0, matchIndex - 80), matchIndex).toLowerCase();
+    const negationPatterns = [
+      /\bnot\s+(?:a\s+|any\s+)?$/,
+      /\bavoid\s+(?:any\s+|the\s+)?$/,
+      /\bno\s+(?:any\s+)?$/,
+      /\bnever\s+$/,
+      /\bwithout\s+(?:any\s+)?$/,
+      /\bforbidden[:\s]+(?:any\s+)?$/,
+      /❌[\s\S]*$/,
+      /\bavoid:[\s\S]*$/,
+      /\bstrictly\s+forbidden[:\s]+[\s\S]*$/,
+    ];
+    return negationPatterns.some(p => p.test(before));
+  }
+
+  for (const { pattern, name } of forbiddenGlowPatterns) {
+    let match;
+    pattern.lastIndex = 0;
+    const globalPattern = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g");
+    while ((match = globalPattern.exec(finalPromptSection)) !== null) {
+      if (isInNegativeContext(finalPromptSection, match.index)) {
+        continue;
+      }
+      throw new Error(
+        `Forbidden glow/halo language: "${match[0]}" (${name}). ` +
+        `Use SUBTLE text integration with crisp edges instead — no glow, no halo.`
+      );
+    }
+  }
+
+  // Validação positiva: deve mencionar termos editoriais/crisp
+  const requiredEditorialPatterns = [
+    /\bcrisp\b/i,
+    /\bsharp\s+edges?\b/i,
+    /\bclean\s+editorial\b/i,
+    /\bsubtle\s+(?:text\s+)?integration\b/i,
+    /\bprinted\s+type\b/i,
+  ];
+
+  const hasEditorialTerms = requiredEditorialPatterns.some(p => p.test(finalPromptSection));
+
+  if (!hasEditorialTerms) {
     throw new Error(
-      `Missing backlight illumination description. ` +
-      `The punchline must have a described glow/halo/backlight effect.`
+      `Missing editorial text integration description. ` +
+      `Must mention crisp/sharp edges, clean editorial style, or subtle integration. ` +
+      `No more "glow" or "halo" — those create amateur results in GPT-Image-1.5.`
     );
   }
 
-  logSync(fn, "exit", { hasIllumination });
+  logSync(fn, "exit", { hasEditorialTerms });
 }
 
 function validateFontStyleChoice(finalPromptSection: string): void {

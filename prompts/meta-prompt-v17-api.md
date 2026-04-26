@@ -73,13 +73,25 @@ The feeling should be **warm editorial heavy sans** — the kind used in modern 
 ## RULE 10 — NO TECHNICAL METADATA IN VISUAL INSTRUCTIONS
 Describe colors by NAME in layout instructions, NOT by hex code. Hex codes ONLY in the dedicated PALETTE section at the end. Same applies to percentages, opacity values, blur radii, angle degrees.
 
-## RULE 11 — BACKLIGHT GLOW EFFECT
-Two combined effects (NOT a directional shadow):
-- Soft warm halo glow radiating outward from the punchline letters in same color as the word, low intensity, no specific direction
-- Subtle backdrop darkening immediately surrounding the punchline letters
+## RULE 11 — SUBTLE TEXT INTEGRATION (no glow effect)
 
-Use terms: "backlight glow", "halo", "illuminated from behind", "warm light leaking from behind".
-Avoid terms: "shadow", "drop shadow", "directional shadow", "shadow projected".
+The text overlay should be integrated into the photo with MINIMAL effect — like a clean editorial graphic designer placed it in Photoshop with a tiny opacity drop on a contrast layer. NOT a stylized glow.
+
+Required:
+- Text has a VERY SUBTLE darkening of the background ONLY directly behind it (1-2px gaussian blur of background, low opacity ~15%)
+- This creates just enough contrast for readability without any visible "effect"
+- The text edges are crisp and sharp — letters look like printed type, not glowing neon
+
+Forbidden (avoid these — they create amateurish results):
+- ANY visible halo around letters
+- ANY golden, yellow, warm, or colored glow
+- ANY "luminous" or "illuminated" appearance
+- ANY soft bloom, lens flare, or light spill
+- ANY backlight effect
+- ANY glow that extends beyond the immediate edge of the letters
+- Drop shadows of any kind
+
+The text should look like clean editorial typography with crisp edges — as if printed on top of the photo with no special effects. Maximum sophistication, minimum visual noise.
 
 ## RULE 12 — LAYOUT TEMPLATES BY LINE COMPOSITION
 **Template A — L2 has connectors AND punchline** (e.g., "não é culpa"):
@@ -125,7 +137,7 @@ LINE 2 contains the punchline word alone:
 7. Weight hierarchy distinct: [YES/NO]
 8. Punchline scale uses ratio formula: [YES/NO]
 9. No hex codes in layout (only in PALETTE section): [YES/NO]
-10. Backlight glow described (not drop shadow): [YES/NO]
+10. Subtle text integration described (NO glow, NO halo, crisp edges): [YES/NO]
 11. Correct template selected: [YES/NO]
 12. Warm geometric font style described (NOT industrial/condensed): [YES/NO]
 
@@ -176,7 +188,7 @@ Position: [lower third] | Alignment: [LEFT/RIGHT] | Lines: [N]
 7. Weight hierarchy: YES
 8. Punchline scale uses ratio: YES
 9. No hex in layout: YES
-10. Backlight glow (not shadow): YES
+10. Subtle integration (no glow): YES
 11. Correct template: YES
 12. Warm geometric font (not industrial): YES
 
@@ -225,17 +237,24 @@ The font should feel warm and editorial, not cold or corporate.
 
 LAYER ORDER: the punchline word renders ON TOP of all other text layers. Tall portions of letters (ascenders) visibly overlap and cover parts of LINE 1 above. Treat the punchline as a single solid layer.
 
-ILLUMINATION EFFECT:
+TEXT INTEGRATION (subtle, editorial — NOT a glow effect):
 
-The punchline word has a backlight glow effect — as if illuminated from behind. Two combined effects:
+The text is rendered as clean editorial typography on top of the photo, like a magazine designer placed it in post-production. NO visible glow, NO halo, NO warm or colored light effects.
 
-(1) A soft warm halo radiates outward from the punchline letters in all directions, in the same color as the punchline word but more diffused and gentle. Low intensity, no specific direction. Not neon, not a sharp outline.
+Required treatment:
+- Letter edges are CRISP and SHARP — high-resolution printed type, not glowing
+- A very subtle background darkening sits ONLY directly behind the text (small radius gaussian blur, ~15% opacity) just enough for legibility
+- This darkening blends imperceptibly with the photo — viewer should not notice an "effect", only that the text is readable
 
-(2) The area immediately surrounding the punchline letters appears slightly darker than the rest of the background, creating natural contrast around the word.
+Strictly forbidden (create amateurish results):
+- ANY visible halo or glow around the letters
+- ANY warm, golden, yellow, or colored light spill
+- ANY luminous, illuminated, or "lit from behind" appearance
+- ANY soft bloom or lens flare
+- ANY drop shadow or directional shadow
+- ANY effect that extends visibly beyond the letter edges
 
-The effect is purely radial backlight glow + subtle backdrop darkening.
-
-LINE 1 (setup) and connectors: no glow. Only natural contrast against the background for legibility.
+The text should look like sharp, contemporary editorial graphic design — think modern magazine spread or polished podcast cover, not movie poster or 90s digital art.
 
 COMPOSITION: organic and editorial feel. Lines should have approximately equal horizontal width. Text feels anchored to the subject's body. No rigid stacking.
 
