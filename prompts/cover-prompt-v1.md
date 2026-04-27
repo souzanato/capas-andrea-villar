@@ -1,490 +1,204 @@
-Use the attached image as the base image.
+EDIT INSTRUCTION: This is an image edit, not a generation. Use the attached image as the base. Add ONLY a typographic text overlay to it. Do NOT regenerate the photo.
 
 Create a [FORMAT_DESC] cover by editing the base image and adding only a premium editorial typographic overlay.
 
-Do not retouch, recolor, relight, crop, replace, blur, beautify, or alter the base photo. Preserve the person, face, skin, hair, expression, body, clothing, hands, background, lighting, framing, camera angle, atmosphere, and all photographic details exactly as they are.
+PRESERVE THE ORIGINAL PHOTO EXACTLY:
+- The person's face, facial features, expression, skin tone, and hair must remain IDENTICAL to the input photo
+- The person's body, pose, clothing, hands, and accessories must remain IDENTICAL
+- The background, environment, lighting, color grading, and atmosphere must remain IDENTICAL
+- Do not retouch, recolor, relight, regenerate, blur, beautify, crop, replace, or "improve" any pixel of the original photo
+- Do not change the framing, crop, or composition
+- The original photo must look completely untouched, as if the text overlay was added in post-production by a professional designer
 
-Title to render:
+ONLY CHANGE: add the typographic text overlay described below.
+
+CRITICAL TEXT FIDELITY:
+Render the title EXACTLY as written below, preserving every character, accent, and diacritic perfectly.
+
+Title to render exactly:
 "[TITLE]"
-
-Default visual direction:
-Premium editorial cover, psychology/motherhood theme, contemporary podcast-cover feel.
-
-Reference accent color:
-[ACCENT_NAME] [ACCENT_HEX].
-
-CRITICAL TEXT RULES:
-Render the title exactly as written, except for square brackets.
-
-Square brackets are markup instructions only. Do not render the characters "[" or "]" in the final image.
-
-Any text inside square brackets is the marked boxed highlight span.
-
-Example:
-Input title: "Mas é [só pedir]"
-Final visible text: "Mas é só pedir"
-Boxed highlight span: "só pedir"
 
 Do not translate, correct, rewrite, reorder, duplicate, remove words, force all caps, invent punctuation, or change accents/spelling.
 
-Line breaks may change, but each line must contain consecutive words and the full reading order must reconstruct the visible title exactly.
+Line breaks may change, but must preserve correct reading order.
 
-BRACKET MARKUP RULE:
-If the title contains square brackets, the text inside the brackets must receive the boxed highlight treatment.
+DEFAULT VISUAL DIRECTION:
+Premium editorial cover, psychology/motherhood theme, contemporary podcast-cover feel.
 
-The brackets themselves must never appear.
+Accent color:
+[ACCENT_NAME] [ACCENT_HEX].
 
-The marked span must remain together as one semantic unit.
-
-If brackets are present, prioritize the bracketed span over automatic semantic guessing.
-
-If there are no brackets, choose the highlighted span semantically using the rules below.
-
-UNBOXED AND BOXED TEXT:
-Text outside square brackets is unboxed text.
-
-Unboxed text must sit directly on the photo with no backing rectangle, no box, no capsule, no label, no panel, no tint, no glow, and no outline.
-
-Text inside square brackets is boxed highlight text.
-
-Boxed highlight text must receive one independent sharp-corner backing rectangle behind the full bracketed phrase.
+---
 
 SEMANTIC ART DIRECTION:
-Before placing the text, interpret the visible title semantically.
 
 Identify:
-- setup: the part that prepares the idea;
-- central concept: the strongest, most clinical, symbolic, memorable, or conceptual word/expression;
-- punchline span: a consecutive word or phrase carrying emotional impact;
-- closure: an emotional, human, or contextual complement.
+- setup
+- central concept (most impactful word or expression)
+- punchline span
+- closure
 
-If the title contains square brackets, the bracketed text is the central concept or punchline span.
+Apply color hierarchy:
+- setup → white
+- central concept / punchline → accent color
+- closure → white or elegant italic serif
 
-The accent color must go on the central concept, punchline span, or bracketed span, not automatically on the last word.
+Do NOT highlight random words. Highlight meaning.
 
-If the emotional meaning depends on a full expression, keep the full expression together and apply the accent color to every word in it.
+---
 
-Examples:
-- Input: "Mas é [só pedir]"
-  Visible text: "Mas é só pedir"
-  "Mas é" is setup and unboxed text.
-  "só pedir" is the boxed highlight span and must stay together.
+TYPOGRAPHY:
 
-- Input: "[Hipervigilância] materna"
-  Visible text: "Hipervigilância materna"
-  "Hipervigilância" is the boxed highlighted central concept.
-  "materna" is unboxed supporting text.
+Use premium editorial font pairing:
 
-- Input: "Cuidar de si [não é egoísmo]"
-  Visible text: "Cuidar de si não é egoísmo"
-  "Cuidar de si" is setup and unboxed text.
-  "não é egoísmo" is the boxed highlighted punchline span.
+Primary:
+- heavy geometric sans (Avenir Black, Gotham Black, Proxima Nova Black feel)
 
-- Input: "Não pensa num [elefante] na sua casa"
-  Visible text: "Não pensa num elefante na sua casa"
-  "elefante" is the boxed highlighted central image/concept.
+Secondary (only for closure if needed):
+- elegant italic serif (Playfair Display Italic / Cormorant Italic feel)
 
-LINE BREAKS:
-Break the visible title into 2 or 3 lines when possible, or 4 compact lines only if the title is long and readability requires it.
-
-Use natural reading rhythm, balanced visual width, and consecutive words only.
-
-Keep the bracketed span together. Do not split bracketed text across unrelated lines unless absolutely necessary for readability.
-
-Do not leave weak connectors alone.
-
-Use compact editorial stacking:
-- lines should feel connected as one typographic block;
-- avoid excessive vertical spacing;
-- avoid detached subtitle behavior;
-- avoid generic centered stacking;
-- for long titles, reduce scale slightly rather than pushing the final line into the bottom unsafe area.
-
-MANDATORY HEAVY TYPOGRAPHY:
-All visible title text must use bold/heavy/black geometric sans typography.
-
-This is a strict standard, not a preference.
-
-Use bold, heavy, extra-bold, or black weight for every word, every line, every span, every unboxed span, and every boxed highlight span.
-
-Both unboxed text and boxed highlight text must use the same bold/heavy/black typographic system.
-
-Do not use serif fonts.
-Do not use italic fonts.
-Do not use script fonts.
-Do not use handwritten fonts.
-Do not use thin, light, regular, medium, delicate, fragile, poetic, decorative, elegant serif, or low-weight typography.
-
-The typography must always look strong, compact, confident, modern, and highly readable, like the “Você é uma boa mãe” reference.
-
-Avoid the “Técnicas de autocuidado” result: do not use delicate serif typography, thin strokes, low contrast, or weak editorial weight.
-
-Primary font style:
-heavy geometric sans, extra-bold or black weight, warm editorial personality, slightly expanded width, softly rounded corners.
-
-Reference feel:
-Avenir Black, Avenir Next Heavy, Gotham Black, Proxima Nova Black, Brandon Grotesque Black, Satoshi Black, Circular Black, Montserrat ExtraBold.
-
-The bracketed span must never use a lighter, thinner, italic, serif, script, or decorative font.
-
-The backing rectangle may change the background behind the bracketed span, but it must not change the rule that all text remains bold/heavy/black geometric sans.
-
-COLOR RULES — FLAT FILL IS ABSOLUTE:
-Letter fill means the real solid color inside the letter shapes.
-
-The interior of every letter must be perfectly flat, solid, uniform, and single-color.
-
-Use pure flat white or warm-white letter fill for unboxed setup/supporting text.
-
-Use an adaptive flat accent color for the central concept, punchline span, or bracketed span, based on [ACCENT_NAME] [ACCENT_HEX].
-
-The accent color must appear as the actual interior fill of the selected words, not as glow, bloom, aura, shadow, contour, background, patch, rectangle, box, stroke, or lighting.
-
-Never use glow, background, patch, shadow, stroke, or outline to simulate letter color.
-
-If a word should be in the accent color, the letter interiors themselves must be flat accent color.
-If a word should be white, the letter interiors themselves must be flat white or warm-white.
-
-The letter fill is a locked flat vector layer.
-
-No effect may alter the interior of the glyphs.
-
-Forbidden inside the letters:
-- gradient fill;
-- vertical gradient;
-- horizontal gradient;
-- radial gradient;
-- color transition;
-- lighting variation;
-- bevel;
-- emboss;
-- inner glow;
-- inner shadow;
-- shine;
-- glossy effect;
-- metallic effect;
-- 3D lighting;
-- shaded fill;
-- textured fill;
-- translucent fill.
-
-Forbidden around letters:
-- stroke;
-- outline;
-- rim;
-- contour;
-- border;
-- sticker edge;
-- colored edge;
-- white edge;
-- halo attached to glyphs;
-- glow attached to glyph edges.
-
-ADAPTIVE ACCENT COLOR:
-The provided accent color [ACCENT_HEX] is the reference brand color, not a rigid value.
-
-Use [ACCENT_HEX] as the starting point. If the selected text placement needs stronger contrast, adapt the accent color slightly while preserving the same hue family and brand feeling.
-
-The final accent fill must be chosen for maximum readability and premium editorial contrast against the actual background behind the text or against the backing rectangle.
-
-Allowed adaptations:
-- slightly lighter;
-- slightly darker;
-- slightly more saturated;
-- slightly less saturated;
-- slightly warmer or cooler only within the same hue family.
-
-Not allowed:
-- changing hue family;
-- turning the accent into cyan, purple, green, yellow, red, or any unrelated color;
-- using gradients;
-- using glow to compensate for poor contrast;
-- using outline/stroke to compensate for poor contrast;
-- reducing readability for strict hex fidelity;
-- making the accent color dull, muddy, or low contrast.
-
-If [ACCENT_HEX] has poor contrast against the chosen background, prioritize a contrast-safe variant of [ACCENT_NAME] over exact hex fidelity.
-
-The adapted accent must remain visually recognizable as a refined version of [ACCENT_NAME].
-
-BRACKETED SPAN BACKING RECTANGLE:
-If the title contains square brackets, create one independent backing rectangle behind the bracketed span.
-
-The backing rectangle is mandatory for bracketed text unless the bracketed span has perfect readability without it.
-
-The backing rectangle must be a separate solid editorial rectangle with sharp 90-degree corners placed behind the entire bracketed word or phrase.
-
-Use sharp 90-degree corners only.
-Do not use rounded corners.
-Do not use a capsule.
-Do not use pill shape.
-Do not use soft rounded rectangle.
-
-The backing rectangle must be behind the phrase, not around the letters.
-
-Layer order:
-1. original photo;
-2. independent sharp-corner backing rectangle behind the bracketed span;
-3. flat solid bracketed text on top.
-
-The backing rectangle must be visibly larger than the bracketed phrase, with clear padding around all sides.
-
-The backing rectangle must have real padding:
-- horizontal padding before the first letter and after the last letter;
-- vertical padding above accents and below descenders;
-- the shape must not hug individual letter contours.
-
-The backing rectangle must follow the bracketed phrase as one whole unit, not each letter.
-
-The backing rectangle must:
-- sit behind only the bracketed span;
-- preserve the phrase as one connected semantic unit;
-- have refined padding around the text;
-- have sharp square corners;
-- be flat, clean, and solid;
-- use high contrast against both the photo background and the text fill;
-- remain visually subordinate to the typography;
-- never cover the face, hands, eyes, mouth, expression, or important narrative elements.
-
-Preferred backing rectangle combinations:
-- ivory/off-white rectangle with accent-color text;
-- warm-white rectangle with accent-color text;
-- deep accent-color rectangle with white or warm-white text;
-- very dark neutral rectangle with white, warm-white, or accent-color text, only if it fits the image and remains premium.
-
-If the bracketed span uses accent-color text, prefer an ivory/off-white or warm-white rectangle behind it when the background is dark, brown, dense, or textured.
-
-If the bracketed span uses white or warm-white text, prefer a deep accent-color or dark neutral rectangle behind it only when needed.
-
-The backing rectangle color must be chosen to maximize:
-1. contrast between photo background and backing rectangle;
-2. contrast between backing rectangle and text fill;
-3. harmony with [ACCENT_NAME] [ACCENT_HEX];
-4. premium editorial appearance.
-
-The backing rectangle must not:
-- appear as an outline around letters;
-- appear as a stroke around letters;
-- trace individual glyph contours;
-- follow the exact shape of the letters;
-- hug the letters without padding;
-- appear behind the entire title by default;
-- become a large banner;
-- become a full-width strip;
-- touch the frame edges;
-- look like a sticker;
-- look like a CTA button;
-- look like a UI component;
-- use gradients;
-- use transparency that harms readability;
-- use heavy shadows;
-- use stroke or outline;
-- use rounded corners;
-- use capsule shape;
-- use pill shape.
-
-If you are about to create an outline around the letters, do not do that. Create one separate sharp-corner rectangle behind the full bracketed phrase instead.
-
-If a backing rectangle is used, all text on top of it must still use flat, solid, uniform letter fill and bold/heavy/black geometric sans typography.
-
-Do not use glow, gradients, bevel, inner shadow, stroke, rim, contour, or outline inside the backing rectangle or on the letters.
-
-CONDITIONAL BACKING RECTANGLE WITHOUT BRACKETS:
-If the title has no square brackets, do not use a backing rectangle by default.
-
-Use one independent backing rectangle only when the semantic central concept or punchline span would have poor readability because it sits over a dense, dark, busy, textured, low-contrast, or visually noisy area.
-
-If used without brackets, the backing rectangle must follow the same rules above and appear only behind the highlighted span.
-
-NO BACKING SHAPES BY DEFAULT:
-The typography must normally sit directly on the photo.
-
-Exception:
-One clean independent editorial backing rectangle is allowed:
-- behind the bracketed span;
-- or behind the central concept/punchline span when contrast is genuinely insufficient.
-
-Do not use a backing rectangle as decoration. Use it only as a functional contrast solution.
-
-NO DECORATIVE GRAPHIC ELEMENTS:
-Do not add any decorative line, divider, separator, underline, stroke bar, horizontal rule, vertical rule, frame, bracket, accent line, graphic mark, or ornamental element.
-
-The typographic overlay must contain only:
-- the visible title text itself;
-- and, only if needed or explicitly marked with brackets, one functional independent backing rectangle behind the highlighted span.
-
-Do not place a line under the text.
-Do not place a separator below the text.
-Do not add bars, rules, markers, flourishes, icons, arrows, frames, or layout decorations.
-
-TEXT SEPARATION — SUBTLE SUPPORT ONLY:
-Text separation must be achieved primarily through:
-1. intelligent placement;
-2. strong flat letter fill;
-3. adaptive accent color contrast;
-4. clean editorial hierarchy;
-5. bracketed backing rectangle when explicitly marked;
-6. conditional independent backing rectangle only when necessary for the highlighted span.
-
-Do not make glow, haze, shadow, outline, stroke, patch, or effects the main source of readability.
-
-If extra separation is needed, use only an extremely subtle soft grounding shadow behind the full text block or behind the backing rectangle.
-
-The shadow must:
-- be soft;
-- be diffuse;
-- be very low opacity;
-- be non-directional;
-- stay close behind the text or backing rectangle;
-- support readability;
-- remain invisible as a separate effect.
-
-The shadow must not:
-- create a dark band;
-- create a visible cast shadow;
-- create a heavy drop shadow;
-- create a black haze;
-- darken the area below the text;
-- look like a Canva shadow;
-- look like an outline;
-- compete with the typography.
-
-No glow is required.
-No luminous patch is allowed.
-No decorative background patch is allowed.
-No letter outline is allowed.
-No text stroke is allowed.
-
-If there is a conflict between clean flat typography and effects, prioritize clean flat typography.
-
-Forbidden color behavior:
-- white letters with colored glow;
-- white letters with accent-color glow;
-- accent words rendered as white letters with accent glow;
-- accent color appearing only as aura/glow;
-- colored glow around white words;
-- punchline in white with colored glow;
-- color-matched glow replacing letter color;
-- different glow colors per word;
-- neon glow;
-- hard outline;
-- visible stroke;
-- sticker effect.
-
-SMART EDITORIAL PLACEMENT:
-Analyze the image before placing the typography.
-
-Do not choose placement only because there is empty space.
-
-Do not place the title at the very top just because the wall is empty.
-
-Prefer a compact lower-middle or mid-lower editorial block when it can sit over clothing, torso, darker background, soft shadow, or a natural contrast area without covering the face.
-
-Important:
-Lower-third does not mean bottom-third. Do not push the text toward the bottom edge.
-
-Choose the area that best combines:
-- safety;
-- contrast;
-- editorial presence;
-- emotional relation to the image;
-- visual breathing room;
-- low noise;
-- a sense that the text is anchored in the scene;
-- Instagram safe zone compatibility.
-
-Never cover:
-face, eyes, mouth, expression, important hands, important body gesture, child's face, key emotional element, or narrative object.
-
-Prefer:
-torso/clothing area when contrast works, lower-left safe area, lower-center safe area, mid-left safe area, calm wall space only if it gives strong editorial presence, soft shadow, medium/dark background, uncluttered bedding/wall/background, or an area that feels like "cover paper".
+Hierarchy:
+- central concept = largest and dominant
+- setup = slightly smaller
+- connectors = smaller
+- closure = italic serif, close to block
 
 Avoid:
-extreme top placement, extreme bottom placement, bright windows, white tiles, overexposed areas, very bright walls when white text is dominant, busy textures, faces, hands, lower cluttered action areas, and areas that make the text feel detached from the person.
+- Helvetica/Arial generic look
+- condensed fonts
+- decorative fonts
+- playful fonts
 
-Exception:
-A light background can work if the dominant text is in the accent color and white text is only smaller supporting text, but readability must come from contrast-safe flat fills, not from a hard outline or decorative backing shape.
-
-INSTAGRAM SAFE ZONE:
-The typography must be composed for Instagram safe zones, not only for the raw image.
-
-Keep all important typography inside the central safe area of the frame.
-
-Avoid placing essential words in:
-- the extreme top area;
-- the extreme bottom area;
-- the right-side vertical UI zone where Reels buttons may appear;
-- the bottom caption/profile/audio area;
-- frame edges;
-- areas likely to be cropped or hidden in Instagram feed previews.
-
-Bottom safety rule:
-The lowest word of the typography must remain comfortably above the lower Instagram UI/caption area. Do not let the final line sit near the bottom edge.
-
-For lower compositions:
-place the block in the lower-middle safe area, not in the extreme bottom. The final line must have clear breathing room below it.
-
-If the text block is tall or has many lines, move the whole block upward or reduce the overall scale slightly instead of letting the last line fall into the bottom unsafe zone.
-
-Do not allow descenders, accents, glow, shadow, backing shapes, rectangles, or decorative elements to touch or approach the bottom edge.
-
-Right-side safety rule:
-Avoid placing important words in the right vertical UI zone. Keep the main text block and any backing rectangle away from the area where like/comment/share buttons appear.
-
-Crop safety rule:
-The title must survive a 4:5 feed preview crop. Keep the most important words inside the central vertical crop-safe region.
-
-Safe-zone priority order:
-1. protect face and emotional/narrative elements;
-2. keep text inside Instagram safe area;
-3. keep the lowest line above the bottom UI/caption zone;
-4. avoid the right-side Reels UI button column;
-5. preserve contrast and readability;
-6. maintain premium editorial composition.
+---
 
 EDITORIAL STACKING:
-Use tight editorial stacking. Lines should feel connected as one designed typographic block.
 
-All lines must remain bold/heavy/black geometric sans.
+- compact vertical block
+- tight line spacing
+- lines visually connected
+- avoid centered generic stacking
+- avoid excessive spacing
+- avoid subtitle detachment
 
-Allow controlled scale contrast:
-- setup line: large and bold/heavy;
-- connector words: smaller only if needed, but still bold/heavy;
-- central concept or punchline: largest and most visually dominant, always bold/heavy/black;
-- bracketed span: always bold/heavy/black.
+---
 
-The central concept or punchline should be the anchor of the block.
+LETTER COLOR:
 
-For long titles:
-keep the block compact, reduce line spacing, and control scale so the block does not invade the bottom unsafe area.
+- white words = solid white fill
+- accent words = solid [ACCENT_HEX] fill
 
-If a backing rectangle is used, keep it aligned with the typographic rhythm and fitted to the highlighted span.
+CRITICAL:
+Letter color is independent from glow.
+Do NOT fake color using glow.
 
-Avoid:
-evenly spaced generic lines, detached subtitle behavior, excessive spacing, random placement, delicate type, serif type, italic type, and text that feels like a template.
+---
 
-SCALE AND RHYTHM:
-Use editorial rhythm.
+🔥 REQUIRED LUMINOUS GLOW (CRITICAL SECTION):
 
-Reduce the overall typography scale by approximately 20% compared to an oversized social-media thumbnail style.
+Create the glow using the logic of professional motion design (After Effects / Premiere):
 
-The text must remain strong and readable, but not huge.
+Simulate:
+- duplicated text layer underneath
+- Gaussian Blur
+- blended with Screen / Add / Linear Dodge
 
-The main line should dominate without crushing the image.
+CRITICAL RULE:
+The glow color is ALWAYS WHITE, independent from the letter color.
 
-The text block should feel compact, anchored, and intentional.
+For ACCENT words:
+- solid accent-color letter fill ([ACCENT_HEX])
+- crisp sharp letter edges
+- visible soft WHITE luminous glow around the letters
 
-Every line must remain visually strong and bold/heavy.
+REFINED GLOW (EDITORIAL LEVEL):
+- glow radius: medium (approx 18–32 px)
+- glow intensity: medium (reduced from strong)
+- softer diffusion (more feathered, less bright core)
+- no hard halo edge
+- subtle falloff into the background
+- creates a controlled cinematic bloom (not punchy, not aggressive)
+- slightly illuminates nearby background but remains restrained
 
-For tall text blocks:
-prefer a slightly smaller but safer composition over a huge composition that reaches the bottom UI area.
+For WHITE words:
+- solid white letter fill
+- very subtle white glow for separation
+- clearly weaker than accent words
 
-Avoid:
-oversized typography, giant headline behavior, vertical stretching, artificial font distortion, warped letters, overly rigid stacking, excessive spacing, light fonts, thin fonts, serif fonts, italic fonts, and text touching image edges.
+STRICTLY FORBIDDEN:
+- glow matching the letter color
+- colored glow (blue, yellow, etc.)
+- stroke / outline / border
+- neon tube effect
+- sticker edge
+- drop shadow
+- offset shadow
 
-FINAL IMAGE:
+The glow MUST be visible but refined.
+Target feel: 8/10 intensity — cinematic, soft, premium, never overpowering.
+
+---
+
+NO GRAPHIC ELEMENTS:
+
+- no lines
+- no separators
+- no underline
+- no bars
+- no boxes
+- no frames
+- no shapes
+
+ONLY typography.
+
+---
+
+🔥 INSTAGRAM SAFE ZONE + FIXED BASELINE SYSTEM (CRITICAL):
+
+The typography must follow a FIXED BASELINE layout system.
+
+Define an invisible horizontal baseline positioned safely above the Instagram bottom UI area.
+
+CRITICAL RULE:
+The LAST LINE of the text block must ALWAYS align to this same baseline, in every image.
+
+- The bottom of the last line must sit at a consistent vertical position (approximately 62–65% of image height from the top)
+- This means the last line ends roughly 35–38% above the bottom edge of the frame
+- The text block must grow UPWARDS from this baseline
+- The text must NEVER expand downward
+
+SAFE ZONE REQUIREMENTS:
+
+- Keep the entire text block inside the central safe area
+- Maintain clear spacing below the last line (minimum 30% of frame height)
+- Never touch the bottom edge
+- Avoid Instagram UI overlap (bottom 25% of frame is forbidden)
+
+PLACEMENT LOGIC:
+
+- Anchor the last line first at the 62–65% mark
+- Build the text upwards
+- Prefer torso/clothing or darker areas
+
+STRICTLY FORBIDDEN:
+
+- vertically centering the block
+- floating placement
+- shifting baseline between images
+- placing any text element below 65% of image height
+
+---
+
+SCALE:
+
+- strong but not oversized
+- compact block
+- dominant central word
+- no distortion
+
+---
+
+FINAL OUTPUT:
+
 Generate the edited image directly.
-
 Do not show the prompt.
-Do not add explanations.
-The final output must be the finished premium editorial cover image.
+Do not explain anything.

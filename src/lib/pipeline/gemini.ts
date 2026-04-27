@@ -1,11 +1,12 @@
 import sharp from "sharp";
-import OpenAI from "openai";
-import { toFile } from "openai/uploads";
+import { GoogleGenAI } from "@google/genai";
 import { readFile } from "fs/promises";
 import path from "path";
 import { enter, exit, log, error as logError } from "./debug-logger";
 
+
 // ── Dimensões finais por formato ─────────────────
+
 
 export const FORMAT_DIMENSIONS = {
   REELS_9_16: { width: 1080, height: 1920 },
@@ -13,15 +14,9 @@ export const FORMAT_DIMENSIONS = {
   CAROUSEL_4_5: { width: 1080, height: 1350 },
 } as const;
 
-// ── Tamanho aceito pela OpenAI Images por formato ──
-
-const OPENAI_SIZE_BY_FORMAT = {
-  REELS_9_16: "1024x1536" as const,
-  FEED_1_1: "1024x1024" as const,
-  CAROUSEL_4_5: "1024x1536" as const,
-};
 
 // ── Descrição de formato pra injetar no prompt ─────
+
 
 const FORMAT_DESC_BY_FORMAT = {
   REELS_9_16: "9:16 vertical Instagram/Reels",
@@ -29,10 +24,9 @@ const FORMAT_DESC_BY_FORMAT = {
   CAROUSEL_4_5: "4:5 portrait Instagram carousel",
 };
 
+
 // ── Mapeamento hex → nome de cor descritivo ────────
-//
-// Pra o GPT-Image entender melhor o tom desejado, passamos
-// um descritor visual ANTES do hex, em vez de só o hex.
+
 
 const ACCENT_COLOR_NAMES: Record<string, string> = {
   "#C8644D": "warm terracotta red",
@@ -40,13 +34,16 @@ const ACCENT_COLOR_NAMES: Record<string, string> = {
   "#2D7A6E": "deep sage green",
 };
 
+
 function resolveAccentName(hex: string | null | undefined): string {
   if (!hex) return "rich blue";
   const upper = hex.toUpperCase();
   return ACCENT_COLOR_NAMES[upper] ?? "the brand accent color";
 }
 
+
 // ── Tipos ──────────────────────────────────────────
+
 
 export interface ImageGenerationInput {
   title: string;
@@ -56,6 +53,7 @@ export interface ImageGenerationInput {
   baseImageMimeType: string;
 }
 
+
 export interface GeneratedImageResult {
   data: Buffer;
   mimeType: string;
@@ -64,18 +62,21 @@ export interface GeneratedImageResult {
   promptUsed: string;
 }
 
+
 // ── Carrega o template de prompt do disco (com cache) ──
+
 
 let cachedPromptTemplate: string | null = null;
 
+
 async function loadPromptTemplate(): Promise<string> {
   if (cachedPromptTemplate) return cachedPromptTemplate;
-
   const promptPath = path.join(process.cwd(), "prompts", "cover-prompt-v1.md");
   const content = await readFile(promptPath, "utf-8");
   cachedPromptTemplate = content;
   return content;
 }
+
 
 function buildPrompt(
   template: string,
@@ -86,6 +87,7 @@ function buildPrompt(
   const accentName = resolveAccentName(accentHex);
   const formatDesc = FORMAT_DESC_BY_FORMAT[format];
 
+
   return template
     .replaceAll("[TITLE]", title)
     .replaceAll("[ACCENT_NAME]", accentName)
@@ -93,14 +95,18 @@ function buildPrompt(
     .replaceAll("[FORMAT_DESC]", formatDesc);
 }
 
+
 // ── Função principal ───────────────────────────────
 
+
 /**
- * Gera a imagem final da capa diretamente via GPT-Image-1.5,
- * sem etapa intermediária de GPT-4o.
+ * Gera a imagem final da capa via Gemini 3.1 Flash Image (Nano Banana 2).
  *
- * O prompt vem do template fixo em prompts/cover-prompt-v1.md,
- * com [TITLE], [ACCENT_NAME], [ACCENT_HEX] e [FORMAT_DESC] substituídos.
+ * Modelo: gemini-3.1-flash-image-preview
+ * (Voltamos do GPT-Image-1.5 pra reduzir custo de ~$0.08 → ~$0.04 por imagem)
+ *
+ * O prompt vem do template em prompts/cover-prompt-v1.md, com placeholders
+ * [TITLE], [ACCENT_NAME], [ACCENT_HEX] e [FORMAT_DESC] substituídos.
  */
 export async function generateImageFromPrompt(
   input: ImageGenerationInput
@@ -113,90 +119,116 @@ export async function generateImageFromPrompt(
     baseImageSize: input.baseImageBase64.length,
   });
 
-  const apiKey = process.env.OPENAI_API_KEY;
+
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    await logError(fn, "OPENAI_API_KEY not configured");
-    throw new Error("OPENAI_API_KEY não configurada.");
+    await logError(fn, "GEMINI_API_KEY not configured");
+    throw new Error("GEMINI_API_KEY não configurada.");
   }
 
+
   // ── 1. Monta o prompt ────────────────────────────
+
 
   const template = await loadPromptTemplate();
   const accentHex = input.accentColor ?? "#1F4E8C";
   const finalPrompt = buildPrompt(template, input.title, accentHex, input.format);
 
+
   await log(fn, "log", { phase: "prompt_ready", promptLength: finalPrompt.length });
 
-  // ── 2. Prepara imagem base como PNG ──────────────
 
-  const baseBuffer = Buffer.from(input.baseImageBase64, "base64");
-  const pngBuffer = await sharp(baseBuffer)
-    .resize(2048, 2048, { fit: "inside", withoutEnlargement: true })
-    .png()
-    .toBuffer();
+  // ── 2. Chama Gemini Flash Image ──────────────────
 
-  await log(fn, "log", {
-    phase: "image_ready",
-    originalSize: baseBuffer.length,
-    pngSize: pngBuffer.length,
-  });
 
-  // ── 3. Chama OpenAI Images Edit ──────────────────
-
-  const openai = new OpenAI({ apiKey });
   const targetDimensions = FORMAT_DIMENSIONS[input.format];
-  const openaiSize = OPENAI_SIZE_BY_FORMAT[input.format];
-  const OPENAI_TIMEOUT_MS = 120_000;
+  const GEMINI_TIMEOUT_MS = 120_000;
+
 
   await log(fn, "http_request", {
-    model: "gpt-image-1.5",
+    model: "gemini-3.1-flash-image-preview",
     promptLength: finalPrompt.length,
-    size: openaiSize,
-    quality: "low",
-    input_fidelity: "high",
   });
 
-  const imageFile = await toFile(pngBuffer, "base.png", { type: "image/png" });
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const openaiPromise = openai.images.edit({
-    model: "gpt-image-1.5",
-    image: imageFile,
-    prompt: finalPrompt,
-    size: openaiSize,
-    quality: "high",
-    input_fidelity: "high",
-    n: 1,
-  } as any);
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+  const ai = new GoogleGenAI({ apiKey });
+
+
+  const geminiPromise = ai.models.generateContent({
+    model: "gemini-3.1-flash-image-preview",
+    contents: [
+      {
+        role: "user",
+        parts: [
+          {
+            inlineData: {
+              mimeType: input.baseImageMimeType,
+              data: input.baseImageBase64,
+            },
+          },
+          { text: finalPrompt },
+        ],
+      },
+    ],
+  });
+
 
   const timeoutPromise = new Promise<never>((_resolve, reject) => {
     setTimeout(
-      () => reject(new Error(`OpenAI Images request timed out after ${OPENAI_TIMEOUT_MS / 1000}s`)),
-      OPENAI_TIMEOUT_MS
+      () => reject(new Error(`Gemini request timed out after ${GEMINI_TIMEOUT_MS / 1000}s`)),
+      GEMINI_TIMEOUT_MS
     );
   });
 
-  const response = await Promise.race([openaiPromise, timeoutPromise]);
 
-  await log(fn, "http_response", {
-    hasData: !!response.data?.length,
-    dataCount: response.data?.length ?? 0,
-  });
+  const response = await Promise.race([geminiPromise, timeoutPromise]);
 
-  const imageData = response.data?.[0];
-  if (!imageData?.b64_json) {
-    await logError(fn, "No image in OpenAI response", {
-      response: JSON.stringify(response).substring(0, 500),
-    });
-    throw new Error(
-      "OpenAI não retornou imagem na resposta. Verifique se sua organização tem acesso ao gpt-image-1.5."
-    );
+
+  // ── 3. Extrai imagem da resposta ─────────────────
+
+
+  const candidates = response.candidates;
+  if (!candidates || candidates.length === 0) {
+    await logError(fn, "No candidates in Gemini response");
+    throw new Error("Gemini não retornou candidatos na resposta.");
   }
 
-  const generatedBuffer = Buffer.from(imageData.b64_json, "base64");
+
+  const parts = candidates[0]?.content?.parts ?? [];
+  let inlineDataB64: string | null = null;
+  let inlineMimeType = "image/png";
+
+
+  for (const part of parts) {
+    if (part.inlineData?.data) {
+      inlineDataB64 = part.inlineData.data;
+      inlineMimeType = part.inlineData.mimeType ?? "image/png";
+      break;
+    }
+  }
+
+
+  if (!inlineDataB64) {
+    await logError(fn, "No inline image in Gemini response", {
+      partsCount: parts.length,
+      response: JSON.stringify(response).substring(0, 500),
+    });
+    throw new Error("Gemini não retornou imagem na resposta.");
+  }
+
+
+  await log(fn, "http_response", {
+    status: "ok",
+    mimeType: inlineMimeType,
+    dataLength: inlineDataB64.length,
+  });
+
+
+  const generatedBuffer = Buffer.from(inlineDataB64, "base64");
+
 
   // ── 4. Redimensiona pro tamanho final ────────────
+
 
   const finalBuffer = await sharp(generatedBuffer)
     .resize(targetDimensions.width, targetDimensions.height, {
@@ -206,13 +238,16 @@ export async function generateImageFromPrompt(
     .png()
     .toBuffer();
 
+
   const metadata = await sharp(finalBuffer).metadata();
+
 
   await exit(fn, {
     width: metadata.width,
     height: metadata.height,
     sizeBytes: finalBuffer.length,
   });
+
 
   return {
     data: finalBuffer,
