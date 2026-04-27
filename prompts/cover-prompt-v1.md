@@ -1,199 +1,234 @@
-EDIT INSTRUCTION: This is an image edit, not a generation. Use the attached image as the base. Add ONLY a typographic text overlay to it. Do NOT regenerate the photo.
+Use the attached image as the base image.
 
 Create a [FORMAT_DESC] cover by editing the base image and adding only a premium editorial typographic overlay.
 
-PRESERVE THE ORIGINAL PHOTO EXACTLY:
-- The person's face, facial features, expression, skin tone, and hair must remain IDENTICAL to the input photo
-- The person's body, pose, clothing, hands, and accessories must remain IDENTICAL
-- The background, environment, lighting, color grading, and atmosphere must remain IDENTICAL
-- Do not retouch, recolor, relight, regenerate, blur, beautify, crop, replace, or "improve" any pixel of the original photo
-- Do not change the framing, crop, or composition
-- The original photo must look completely untouched, as if the text overlay was added in post-production by a professional designer
+---
 
-ONLY CHANGE: add the typographic text overlay described below.
+⚠️ IMAGE PROTECTION — HIGHEST PRIORITY:
 
-CRITICAL TEXT FIDELITY:
-Render the title EXACTLY as written below, preserving every character, accent, and diacritic perfectly.
+Do NOT modify the image in any way.
 
-Title to render exactly:
-"[TITLE]"
+Do NOT:
+- retouch
+- recolor
+- relight
+- crop
+- enhance
+- blur
+- replace
+- regenerate
 
-Do not translate, correct, rewrite, reorder, duplicate, remove words, force all caps, invent punctuation, or change accents/spelling.
+The original image must remain EXACTLY the same.
 
-Line breaks may change, but must preserve correct reading order.
+If anything changes in the image → INVALID OUTPUT.
 
-DEFAULT VISUAL DIRECTION:
-Premium editorial cover, psychology/motherhood theme, contemporary podcast-cover feel.
+---
+
+TITLE:
+
+Render the following text exactly as written:
+
+[TITLE]
+
+Do NOT:
+- translate
+- rewrite
+- reorder
+- remove words
+- duplicate words
+- change accents
+- change spelling
+
+---
+
+VISUAL DIRECTION:
+
+Premium editorial cover, psychology/motherhood theme, contemporary podcast/Reels cover feel.
 
 Accent color:
-[ACCENT_NAME] [ACCENT_HEX].
+[ACCENT_NAME] [ACCENT_HEX]
 
 ---
 
-SEMANTIC ART DIRECTION:
+TASK TYPE:
 
-Identify:
-- setup
-- central concept (most impactful word or expression)
-- punchline span
-- closure
+This is a STRICT editorial typography overlay.
 
-Apply color hierarchy:
-- setup → white
-- central concept / punchline → accent color
-- closure → white or elegant italic serif
-
-Do NOT highlight random words. Highlight meaning.
+Not a creative interpretation.
 
 ---
 
-TYPOGRAPHY:
+SAFE ZONE — MANDATORY:
 
-Use premium editorial font pairing:
+Identify the face.
 
-Primary:
-- heavy geometric sans (Avenir Black, Gotham Black, Proxima Nova Black feel)
+Define a protected area covering:
+- eyes
+- eyebrows
+- nose
+- mouth
+- cheeks
+- chin
 
-Secondary (only for closure if needed):
-- elegant italic serif (Playfair Display Italic / Cormorant Italic feel)
+🚫 NO TEXT may overlap this area.
 
-Hierarchy:
-- central concept = largest and dominant
-- setup = slightly smaller
-- connectors = smaller
-- closure = italic serif, close to block
+Text must be placed only in:
+- above the face
+- below the face
+- side areas (if clean)
+
+Face visibility has priority over typography.
+
+---
+
+TEXT LOCK:
+
+Treat [TITLE] as a fixed visual string.
+
+Render ONLY the text in [TITLE].
+
+Do not add any extra text.
+
+Line breaks are allowed, but:
+- every line must contain consecutive words
+- reading order must reconstruct [TITLE] exactly
+
+---
+
+🔥 INTELLIGENT PORTUGUESE LINE BREAK (ADVANCED):
+
+Line breaks must follow Portuguese grammar and editorial design principles.
+
+DEFAULT:
+- do NOT split words
+- no hyphenation
+
+EXCEPTION — LONG WORD:
+
+If a word is too long and breaks layout:
+
+→ it MAY be split
+
+ONLY IF:
+- it follows correct Portuguese syllabic division
+- improves visual balance
+
+Example:
+e-go-ís-mo
+
+PREFER:
+- giving the word its own line
+- scaling before splitting
+
+FORBIDDEN:
+- incorrect splits
+- stylistic-only splitting
+- breaking short words
+
+---
+
+SEMANTIC EMPHASIS:
+
+Identify the main emphasis word or phrase in [TITLE].
+
+The emphasis is the strongest semantic or emotional element.
+
+The emphasis word must:
+- use [ACCENT_HEX]
+- be larger than other words
+- carry the main visual weight
+
+All other text must be white.
+
+---
+
+✨ MANDATORY GLOW ON ACCENT:
+
+The accent-colored word MUST have a visible WHITE glow.
+
+Glow must:
+- be clearly visible at first glance
+- surround the entire word evenly
+- be soft but strong
+- improve contrast against background
+
+Do NOT:
+- omit glow
+- use colored glow
+- make it subtle
+
+If glow is not visible → INVALID OUTPUT.
+
+---
+
+LAYOUT STRUCTURE:
+
+Create ONE cohesive editorial text block.
+
+The block may have 2–4 lines.
+
+The layout must feel:
+- compact
+- intentional
+- balanced
+- readable
 
 Avoid:
-- Helvetica/Arial generic look
-- condensed fonts
-- decorative fonts
-- playful fonts
-
----
-
-EDITORIAL STACKING:
-
-- compact vertical block
-- tight line spacing
-- lines visually connected
-- avoid centered generic stacking
-- avoid excessive spacing
-- avoid subtitle detachment
-
----
-
-LETTER COLOR:
-
-- white words = solid white fill
-- accent words = solid [ACCENT_HEX] fill
-
-CRITICAL:
-Letter color is independent from glow.
-Do NOT fake color using glow.
-
----
-
-🔥 REQUIRED LUMINOUS GLOW (CRITICAL SECTION):
-
-Create the glow using the logic of professional motion design (After Effects / Premiere):
-
-Simulate:
-- duplicated text layer underneath
-- Gaussian Blur
-- blended with Screen / Add / Linear Dodge
-
-CRITICAL RULE:
-The glow color is ALWAYS WHITE, independent from the letter color.
-
-For ACCENT words:
-- solid accent-color letter fill ([ACCENT_HEX])
-- crisp sharp letter edges
-- visible soft WHITE luminous glow around the letters
-
-REFINED GLOW (EDITORIAL LEVEL):
-- glow radius: medium (approx 18–32 px)
-- glow intensity: medium (reduced from strong)
-- softer diffusion (more feathered, less bright core)
-- no hard halo edge
-- subtle falloff into the background
-- creates a controlled cinematic bloom (not punchy, not aggressive)
-- slightly illuminates nearby background but remains restrained
-
-For WHITE words:
-- solid white letter fill
-- very subtle white glow for separation
-- clearly weaker than accent words
-
-STRICTLY FORBIDDEN:
-- glow matching the letter color
-- colored glow (blue, yellow, etc.)
-- stroke / outline / border
-- neon tube effect
-- sticker edge
-- drop shadow
-- offset shadow
-
-The glow MUST be visible but refined.
-Target feel: 8/10 intensity — cinematic, soft, premium, never overpowering.
-
----
-
-NO GRAPHIC ELEMENTS:
-
-- no lines
-- no separators
-- no underline
-- no bars
-- no boxes
-- no frames
-- no shapes
-
-ONLY typography.
-
----
-
-🔥 INSTAGRAM SAFE ZONE + FIXED BASELINE SYSTEM (CRITICAL):
-
-The typography must follow a FIXED BASELINE layout system.
-
-Define an invisible horizontal baseline positioned safely above the Instagram bottom UI area.
-
-CRITICAL RULE:
-The LAST LINE of the text block must ALWAYS align to this same baseline, in every image.
-
-- The bottom of the last line must sit at a consistent vertical position (approximately 62–65% of image height from the top)
-- This means the last line ends roughly 35–38% above the bottom edge of the frame
-- The text block must grow UPWARDS from this baseline
-- The text must NEVER expand downward
-
-SAFE ZONE REQUIREMENTS:
-
-- Keep the entire text block inside the central safe area
-- Maintain clear spacing below the last line (minimum 30% of frame height)
-- Never touch the bottom edge
-- Avoid Instagram UI overlap (bottom 25% of frame is forbidden)
-
-PLACEMENT LOGIC:
-
-- Anchor the last line first at the 62–65% mark
-- Build the text upwards
-- Prefer torso/clothing or darker areas
-
-STRICTLY FORBIDDEN:
-
-- vertically centering the block
-- floating placement
-- shifting baseline between images
-- placing any text element below 65% of image height
+- scattered words
+- excessive spacing
+- floating fragments
 
 ---
 
 SCALE:
 
-- strong but not oversized
-- compact block
-- dominant central word
-- no distortion
+Typography must be large and impactful.
+
+The emphasis word should:
+- dominate visually
+- occupy significant horizontal space
+
+Avoid timid sizing.
+
+---
+
+TYPOGRAPHY:
+
+Use heavy, modern sans-serif style.
+
+Bold / Black weight.
+
+Avoid:
+- thin fonts
+- decorative fonts
+- default system appearance
+
+Optional:
+Use elegant italic serif only if it enhances meaning.
+
+---
+
+INSTAGRAM SAFE ZONE:
+
+Keep text inside safe central area.
+
+Avoid:
+- bottom UI area
+- right-side interaction zone
+- extreme edges
+
+---
+
+NO GRAPHIC ELEMENTS:
+
+Do NOT add:
+- boxes
+- lines
+- icons
+- shapes
+- decorations
+
+ONLY typography.
 
 ---
 
