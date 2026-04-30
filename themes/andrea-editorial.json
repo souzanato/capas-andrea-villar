@@ -1,0 +1,16 @@
+{
+  "id": "andrea-editorial",
+  "name": "Andrea Editorial",
+  "description": "Estilo editorial, glow sutil, hierarquia semantica forte",
+
+  "fonts": {
+    "primary": "Anton",
+    "italic": "PlayfairDisplay"
+  },
+
+  "positioning": {
+    "preferredZones": ["lower-third-left", "lower-center", "mid-left"],
+    "avoidZones": ["face", "hands", "edges", "right-ui-zone"],
+    "safeMargin": { "top": 80, "bottom": 200, "left": 60, "right": 60 }
+  }
+}

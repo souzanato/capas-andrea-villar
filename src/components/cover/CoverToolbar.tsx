@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Download, Copy, Trash2, ChevronDown, RefreshCw } from "lucide-react";
+import {
+  Undo2,
+  Redo2,
+  Download,
+  Copy,
+  Trash2,
+  ChevronDown,
+  RefreshCw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +28,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import type Konva from "konva";
 
 interface CoverVersion {
   version: number;
@@ -28,54 +37,92 @@ interface CoverVersion {
 }
 
 interface CoverToolbarProps {
-  coverId: string;
-  coverTitle: string;
+  cover: {
+    id: string;
+    title: string;
+    generatedPrompt: string | null;
+  };
   versions: CoverVersion[];
   currentVersion: number;
   onVersionChange: (version: number) => void;
-  generatedPrompt: string | null;
   isProcessing?: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  stageRef: React.RefObject<Konva.Stage | null>;
+  onSave?: () => void;
 }
 
 export default function CoverToolbar({
-  coverId,
-  coverTitle,
+  cover,
   versions,
   currentVersion,
   onVersionChange,
-  generatedPrompt,
   isProcessing = false,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
+  stageRef,
+  onSave,
 }: CoverToolbarProps) {
   const router = useRouter();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
-  async function handleDownload() {
+  async function handleExport() {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    setExporting(true);
     try {
-      const res = await fetch(`/api/covers/${coverId}/image?version=${currentVersion}`);
-      if (!res.ok) throw new Error("Falha ao baixar");
+      // 1. Esconde o Transformer antes de exportar
+      const transformer = stage.findOne("Transformer");
+      if (transformer) transformer.hide();
+      stage.draw();
 
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const slug = coverTitle
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-      a.href = url;
-      a.download = `${slug}-v${currentVersion}.png`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      toast.error("Erro ao baixar imagem");
+      // 2. Gera PNG do canvas
+      const dataUrl = stage.toDataURL({ pixelRatio: 2 });
+
+      // Restaura o Transformer
+      if (transformer) transformer.show();
+      stage.draw();
+
+      // 2. Salva no banco
+      const res = await fetch(`/api/covers/${cover.id}/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dataUrl }),
+      });
+
+      if (!res.ok) throw new Error("Erro ao salvar");
+
+      // Salva layoutJson também
+      onSave?.();
+
+      // Dispara download no browser
+      const link = document.createElement("a");
+      link.href = dataUrl; // usa o dataUrl local pra não precisar re-fetch
+      link.download = `capa-${cover.id}-v${Date.now()}.png`;
+      link.click();
+
+      toast.success("Exportado! Imagem salva e baixada.");
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao exportar");
+    } finally {
+      setExporting(false);
     }
   }
 
   async function handleCopyPrompt() {
-    if (!generatedPrompt) return;
+    if (!cover.generatedPrompt) return;
     try {
-      await navigator.clipboard.writeText(generatedPrompt);
+      await navigator.clipboard.writeText(cover.generatedPrompt);
       toast.success("Prompt copiado!");
     } catch {
       toast.error("Erro ao copiar prompt");
@@ -85,7 +132,7 @@ export default function CoverToolbar({
   async function handleRegenerate() {
     setRegenerating(true);
     try {
-      const res = await fetch(`/api/covers/${coverId}/regenerate`, {
+      const res = await fetch(`/api/covers/${cover.id}/regenerate`, {
         method: "POST",
       });
       if (!res.ok) {
@@ -105,7 +152,7 @@ export default function CoverToolbar({
   async function handleDelete() {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/covers/${coverId}`, { method: "DELETE" });
+      const res = await fetch(`/api/covers/${cover.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Falha ao excluir");
       toast.success("Capa excluída");
       router.push("/dashboard");
@@ -118,6 +165,28 @@ export default function CoverToolbar({
 
   return (
     <div className="flex items-center justify-center gap-2 flex-wrap">
+      {/* Undo / Redo */}
+      <div className="flex items-center gap-0.5">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={!canUndo}
+          onClick={onUndo}
+          title="Desfazer (Cmd+Z)"
+        >
+          <Undo2 className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={!canRedo}
+          onClick={onRedo}
+          title="Refazer (Cmd+Shift+Z)"
+        >
+          <Redo2 className="h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Versão */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -139,19 +208,20 @@ export default function CoverToolbar({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Download */}
+      {/* Exportar PNG */}
       <Button
-        variant="outline"
+        variant="default"
         size="sm"
         className="gap-1"
-        onClick={handleDownload}
+        onClick={handleExport}
+        disabled={exporting}
       >
-        <Download className="h-4 w-4" />
-        Download
+        <Download className={`h-4 w-4 ${exporting ? "animate-pulse" : ""}`} />
+        {exporting ? "Exportando..." : "Exportar PNG"}
       </Button>
 
       {/* Copiar prompt */}
-      {generatedPrompt && (
+      {cover.generatedPrompt && (
         <Button
           variant="outline"
           size="sm"

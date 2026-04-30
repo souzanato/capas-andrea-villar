@@ -16,6 +16,7 @@ interface CoverItem {
   status: string;
   createdAt: string;
   contentType: string;
+  baseImageId: string | null;
   generatedImages: Array<{
     id: string;
     version: number;

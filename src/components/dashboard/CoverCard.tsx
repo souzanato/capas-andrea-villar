@@ -36,6 +36,7 @@ interface CoverCardCover {
   status: string;
   contentType: string;
   createdAt: string;
+  baseImageId: string | null;
   generatedImages: Array<{
     id: string;
     version: number;
@@ -71,9 +72,13 @@ export default function CoverCard({ cover }: CoverCardProps) {
   const [deleting, setDeleting] = useState(false);
 
   const aspectClass = ASPECT_MAP[cover.format] ?? "aspect-[4/5]";
-  const hasImage =
-    cover.status === "COMPLETED" && cover.generatedImages.length > 0;
-  const thumbnailUrl = `/api/covers/${cover.id}/image`;
+  const hasGeneratedImage = cover.generatedImages.length > 0;
+  const hasBaseImage = !!cover.baseImageId;
+  const hasImage = cover.status === "COMPLETED" && (hasGeneratedImage || hasBaseImage);
+  const latestVersion = cover.generatedImages[0]?.version ?? 0;
+  const thumbnailUrl = hasGeneratedImage
+    ? `/api/covers/${cover.id}/image?v=${latestVersion}`
+    : `/api/covers/${cover.id}/image?type=base`;
 
   async function handleDuplicate(e: React.MouseEvent) {
     e.preventDefault();
@@ -190,7 +195,7 @@ export default function CoverCard({ cover }: CoverCardProps) {
         <h3 className="font-medium text-sm text-foreground line-clamp-1 tracking-tight">
           {cover.title}
         </h3>
-        <p className="text-xs text-foreground-soft mt-1">
+        <p className="text-xs text-foreground-soft mt-1" suppressHydrationWarning>
           {formatRelativeTime(cover.createdAt)} · {cover.contentType}
         </p>
       </div>

@@ -9,9 +9,10 @@ export const FORMAT_LABELS: Record<string, string> = {
 };
 
 export const ACCENT_COLORS_ANDREA = [
-  { hex: "#C8644D", label: "Emocional, acolhedor" },
-  { hex: "#1F4E8C", label: "Calma, reflexão" },
-  { hex: "#2D7A6E", label: "Esperança, equilíbrio" },
+  { hex: "#C8644D" },
+  { hex: "#1F4E8C" },
+  { hex: "#2D7A6E" },
+  { hex: "#8B3F9E" },
 ];
 
 export const coverFormSchema = z.object({

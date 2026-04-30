@@ -1,21 +1,21 @@
 import { db } from "@/lib/db";
-import { generateImageFromPrompt } from "./gemini";
-import { enter, exit, log, error as logError, errorSync, logSync } from "./debug-logger";
+import { analyzeCover } from "./analyze-cover";
+import { enter, exit, log, error as logError, errorSync } from "./debug-logger";
+import type { Prisma } from "@prisma/client";
 
 /**
- * Pipeline simplificado:
+ * Pipeline novo:
  *   1. Carrega cover + baseImage
- *   2. Chama GPT-Image-1.5 direto (sem GPT-4o)
- *   3. Salva GeneratedImage e marca COMPLETED
- *   4. Em caso de erro, marca FAILED
+ *   2. Chama GPT-4o vision -> retorna JSON de layout
+ *   3. Salva layoutJson no Cover
+ *   4. Marca COMPLETED
+ *
+ * NAO gera mais imagem editada nessa fase.
+ * A renderizacao do PNG vai acontecer no editor (client-side, via Konva).
  */
 export async function runFullPipeline(coverId: string): Promise<void> {
   const fn = "runFullPipeline";
   await enter(fn, { coverId });
-
-  process.once("unhandledRejection", (reason) => {
-    logSync("process", "error", { event: "unhandledRejection", reason: String(reason), coverId });
-  });
 
   const pipelineStart = Date.now();
 
@@ -24,58 +24,35 @@ export async function runFullPipeline(coverId: string): Promise<void> {
     include: { baseImage: true },
   });
 
-  if (!cover) { await logError(fn, "Cover not found"); throw new Error("Capa não encontrada."); }
+  if (!cover) { await logError(fn, "Cover not found"); throw new Error("Capa nao encontrada."); }
   if (!cover.baseImage) { await logError(fn, "No base image"); throw new Error("Capa sem imagem base."); }
 
   try {
-    await log(fn, "log", { phase: "GENERATING_IMAGE", baseImageSize: cover.baseImage.data.length });
+    await log(fn, "log", { phase: "GENERATING_PROMPT" });
     await db.cover.update({
       where: { id: coverId },
-      data: { status: "GENERATING_IMAGE" },
+      data: { status: "GENERATING_PROMPT" },
     });
 
     const imageBase64 = Buffer.from(cover.baseImage.data).toString("base64");
 
-    const result = await generateImageFromPrompt({
+    const layout = await analyzeCover({
       title: cover.title,
-      accentColor: cover.accentColor,
+      accentHex: cover.accentColor ?? "#1F4E8C",
       format: cover.format,
+      themeId: cover.themeId ?? "andrea-editorial",
       baseImageBase64: imageBase64,
       baseImageMimeType: cover.baseImage.mimeType,
     });
 
-    await log(fn, "log", { phase: "IMAGE_READY", sizeBytes: result.data.length, width: result.width, height: result.height });
+    await log(fn, "log", { phase: "LAYOUT_READY", textBlocksCount: layout.textBlocks.length });
 
-    // Salva o prompt usado no Cover (campo já existe — aproveitamos)
     await db.cover.update({
       where: { id: coverId },
-      data: { generatedPrompt: result.promptUsed },
-    });
-
-    const latestVersion = await db.generatedImage.findFirst({
-      where: { coverId },
-      orderBy: { version: "desc" },
-      select: { version: true },
-    });
-
-    const version = (latestVersion?.version ?? 0) + 1;
-
-    await db.generatedImage.create({
       data: {
-        coverId,
-        data: result.data,
-        mimeType: result.mimeType,
-        width: result.width,
-        height: result.height,
-        sizeBytes: result.data.length,
-        version,
-        promptUsed: result.promptUsed,
+        status: "COMPLETED",
+        layoutJson: layout as Prisma.InputJsonValue,
       },
-    });
-
-    await db.cover.update({
-      where: { id: coverId },
-      data: { status: "COMPLETED" },
     });
 
     const totalDuration = ((Date.now() - pipelineStart) / 1000).toFixed(1);

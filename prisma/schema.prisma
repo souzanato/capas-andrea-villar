@@ -52,6 +52,8 @@ model Cover {
   generatedPrompt   String?  @db.Text
   status            Status   @default(PENDING)
   errorMessage      String?
+  layoutJson        Json?
+  themeId           String   @default("andrea-editorial")
   metaPromptVersion String   @default("v10")
 
   // Relação 1:1 opcional com a imagem base enviada pelo usuário

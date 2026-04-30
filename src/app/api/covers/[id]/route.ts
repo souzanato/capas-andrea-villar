@@ -46,3 +46,36 @@ export async function DELETE(
 
   return NextResponse.json({ success: true });
 }
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const cover = await db.cover.findUnique({ where: { id: params.id } });
+
+  if (!cover) {
+    return NextResponse.json({ error: "Cover not found" }, { status: 404 });
+  }
+
+  if (cover.userId !== session.user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const body = await req.json();
+  const { layoutJson } = body;
+  if (!layoutJson) {
+    return NextResponse.json({ error: "layoutJson required" }, { status: 400 });
+  }
+
+  const updated = await db.cover.update({
+    where: { id: params.id },
+    data: { layoutJson },
+  });
+
+  return NextResponse.json({ cover: updated });
+}

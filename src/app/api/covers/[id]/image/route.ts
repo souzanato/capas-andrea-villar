@@ -68,7 +68,7 @@ export async function GET(
   return new NextResponse(Buffer.from(generated.data), {
     headers: {
       "Content-Type": generated.mimeType,
-      "Cache-Control": "private, max-age=3600",
+      "Cache-Control": "private, no-cache, must-revalidate",
     },
   });
 }

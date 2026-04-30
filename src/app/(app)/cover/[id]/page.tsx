@@ -50,6 +50,7 @@ export default async function CoverDetailPage({
 
   const isProcessing =
     cover.status === "PENDING" ||
+    cover.status === "GENERATING_PROMPT" ||
     cover.status === "GENERATING_IMAGE";
 
   // Serialize for client component (Dates → strings)

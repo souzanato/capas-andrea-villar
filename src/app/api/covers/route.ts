@@ -159,6 +159,7 @@ export async function POST(request: NextRequest) {
           accentColor: parsed.data.accentColor,
           baseImageId: image.id,
           status: "PENDING",
+          themeId: "andrea-editorial",
           metaPromptVersion: "v1-simple",
         },
       });

@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
-import CoverHeader from "@/components/cover/CoverHeader";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import EditorHeader from "@/components/cover/EditorHeader";
+import EditorClient from "@/components/editor/EditorClient";
+import type { EditorHandle } from "@/components/editor/EditorClient";
 import CoverImage from "@/components/cover/CoverImage";
 import CoverToolbar from "@/components/cover/CoverToolbar";
-import CoverInputsCard from "@/components/cover/CoverInputsCard";
-import CoverPromptCard from "@/components/cover/CoverPromptCard";
+import type { CoverLayout } from "@/lib/editor/layout-schema";
+import type { SaveStatus } from "@/hooks/useSaveLayout";
+import type Konva from "konva";
 
 interface CoverDetailGeneratedImage {
   version: number;
@@ -20,20 +23,23 @@ interface CoverDetailBaseImage {
   mimeType: string;
 }
 
+interface CoverDetailCover {
+  id: string;
+  title: string;
+  format: string;
+  contentType: string;
+  palette: string;
+  accentColor: string | null;
+  status: string;
+  createdAt: string;
+  generatedPrompt: string | null;
+  layoutJson: unknown;
+  baseImage: CoverDetailBaseImage | null;
+  generatedImages: CoverDetailGeneratedImage[];
+}
+
 interface CoverDetailProps {
-  cover: {
-    id: string;
-    title: string;
-    format: string;
-    contentType: string;
-    palette: string;
-    accentColor: string | null;
-    status: string;
-    createdAt: string;
-    generatedPrompt: string | null;
-    baseImage: CoverDetailBaseImage | null;
-    generatedImages: CoverDetailGeneratedImage[];
-  };
+  cover: CoverDetailCover;
 }
 
 export default function CoverDetail({ cover }: CoverDetailProps) {
@@ -47,64 +53,96 @@ export default function CoverDetail({ cover }: CoverDetailProps) {
   }, [cover.generatedImages]);
 
   const latestVersion = versions[0]?.version ?? 1;
-
   const [currentVersion, setCurrentVersion] = useState(latestVersion);
+  const [currentLayout, setCurrentLayout] = useState<CoverLayout | null>(
+    cover.layoutJson as CoverLayout | null
+  );
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
-  // Track new versions (via badge) and auto-switch when a new one appears
   const prevCountRef = useRef(cover.generatedImages.length);
+  const stageRef = useRef<Konva.Stage>(null);
+  const editorRef = useRef<EditorHandle>(null);
+
+  const handleUndo = useCallback(() => {
+    editorRef.current?.undo();
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    editorRef.current?.redo();
+  }, []);
+
+  const handleSave = useCallback(() => {
+    editorRef.current?.saveNow();
+  }, []);
 
   useEffect(() => {
     const currentCount = cover.generatedImages.length;
     if (currentCount > prevCountRef.current) {
-      // New version detected — auto-switch to latest
       setCurrentVersion(latestVersion);
     }
     prevCountRef.current = currentCount;
   }, [cover.generatedImages, latestVersion]);
 
   const imageUrl = `/api/covers/${cover.id}/image?version=${currentVersion}`;
-
   const isProcessing = cover.status !== "COMPLETED";
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-      {/* Left column — Image + Toolbar */}
-      <div className="lg:col-span-3 space-y-6">
-        <CoverHeader
-          title={cover.title}
-          status={cover.status}
-          createdAt={cover.createdAt}
-        />
+    <div className="flex flex-col gap-6 min-h-[calc(100vh-8rem)]">
+      <EditorHeader
+        title={cover.title}
+        status={cover.status}
+        createdAt={cover.createdAt}
+        format={cover.format}
+        accentColor={cover.accentColor}
+        baseImage={cover.baseImage}
+        layout={currentLayout}
+        coverId={cover.id}
+        saveStatus={saveStatus}
+        onSave={handleSave}
+      />
 
-        <CoverImage
-          src={imageUrl}
-          alt={cover.title}
-          format={cover.format}
-        />
+      <div className="flex-1">
+        {cover.layoutJson ? (
+          <EditorClient
+            initialLayout={cover.layoutJson as CoverLayout}
+            baseImageUrl={`/api/covers/${cover.id}/image?type=base`}
+            onLayoutChange={setCurrentLayout}
+            stageRef={stageRef}
+            ref={editorRef}
+            onHistoryChange={(cu, cr) => {
+              setCanUndo(cu);
+              setCanRedo(cr);
+            }}
+            coverId={cover.id}
+            onSaveStatusChange={setSaveStatus}
+          />
+        ) : (
+          <div className="max-w-md mx-auto">
+            <CoverImage
+              src={imageUrl}
+              alt={cover.title}
+              format={cover.format}
+            />
+          </div>
+        )}
+      </div>
 
+      <div className="border-t border-border pt-4">
         <CoverToolbar
-          coverId={cover.id}
-          coverTitle={cover.title}
+          cover={{ id: cover.id, title: cover.title, generatedPrompt: cover.generatedPrompt }}
           versions={versions}
           currentVersion={currentVersion}
           onVersionChange={setCurrentVersion}
-          generatedPrompt={cover.generatedPrompt}
           isProcessing={isProcessing}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          stageRef={stageRef}
+          onSave={handleSave}
         />
-      </div>
-
-      {/* Right column — Inputs + Refino + Prompt */}
-      <div className="lg:col-span-2 space-y-6">
-        <CoverInputsCard
-          title={cover.title}
-          format={cover.format}
-          accentColor={cover.accentColor}
-          baseImage={cover.baseImage}
-        />
-
-        {cover.generatedPrompt && (
-          <CoverPromptCard prompt={cover.generatedPrompt} />
-        )}
       </div>
     </div>
   );

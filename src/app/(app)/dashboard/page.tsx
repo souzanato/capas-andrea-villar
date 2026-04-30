@@ -68,6 +68,7 @@ export default async function DashboardPage({
         status: true,
         createdAt: true,
         contentType: true,
+        baseImageId: true,
         generatedImages: {
           orderBy: { version: "desc" },
           take: 1,
