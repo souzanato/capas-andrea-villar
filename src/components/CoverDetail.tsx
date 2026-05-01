@@ -60,6 +60,7 @@ export default function CoverDetail({ cover }: CoverDetailProps) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [showSafeZone, setShowSafeZone] = useState(false);
 
   const prevCountRef = useRef(cover.generatedImages.length);
   const stageRef = useRef<Konva.Stage>(null);
@@ -117,6 +118,7 @@ export default function CoverDetail({ cover }: CoverDetailProps) {
             }}
             coverId={cover.id}
             onSaveStatusChange={setSaveStatus}
+            showSafeZone={showSafeZone}
           />
         ) : (
           <div className="max-w-md mx-auto">
@@ -142,6 +144,8 @@ export default function CoverDetail({ cover }: CoverDetailProps) {
           canRedo={canRedo}
           stageRef={stageRef}
           onSave={handleSave}
+          showSafeZone={showSafeZone}
+          onToggleSafeZone={() => setShowSafeZone((v) => !v)}
         />
       </div>
     </div>

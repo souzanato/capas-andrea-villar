@@ -1,31 +1,39 @@
-import { auth } from "@/lib/auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
-export default auth((req) => {
-  const { pathname } = req.nextUrl;
-  const isLoggedIn = !!req.auth;
+const CREATOR_ROUTES = ["/dashboard", "/cover", "/new"];
+const ADMIN_ROUTES = ["/admin"];
 
-  const isAuthRoute = pathname.startsWith("/api/auth");
-  const isLoginPage = pathname === "/login";
-  const isStaticFile =
+export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
+
+  // Ignorar arquivos estáticos
+  if (
     pathname.startsWith("/_next") ||
-    pathname === "/favicon.ico" ||
-    /\.(png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|otf|eot|css|js)$/i.test(pathname);
-
-  // Nunca bloquear arquivos estáticos ou API de auth
-  if (isStaticFile || isAuthRoute) return;
-
-  // Não autenticado → login
-  if (!isLoggedIn && !isLoginPage) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/fonts") ||
+    pathname.startsWith("/generated") ||
+    pathname === "/favicon.ico"
+  ) {
+    return NextResponse.next();
   }
 
-  // Autenticado tentando acessar login → dashboard
-  if (isLoggedIn && isLoginPage) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  const isCreatorRoute = CREATOR_ROUTES.some((r) => pathname.startsWith(r));
+  const isAdminRoute = ADMIN_ROUTES.some((r) => pathname.startsWith(r));
+
+  // Verificar sessão via cookie (sem Prisma — seguro no edge)
+  const sessionCookie = getSessionCookie(req);
+
+  if (!sessionCookie) {
+    if (isCreatorRoute || isAdminRoute) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    return NextResponse.next();
   }
-});
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

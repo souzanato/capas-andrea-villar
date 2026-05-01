@@ -108,7 +108,6 @@ export default function EditorSidebar({
 
         <GlowControl
           value={effects?.glow ?? null}
-          defaultColor="#FFFFFF"
           onChange={(glow) => updateEffects({ glow })}
         />
 

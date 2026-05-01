@@ -14,7 +14,6 @@ interface GlowConfig {
 
 interface GlowControlProps {
   value: GlowConfig | null;
-  defaultColor: string;
   onChange: (value: GlowConfig | null) => void;
 }
 
@@ -33,7 +32,7 @@ const DEFAULT_GLOW_ON = {
   opacity: 0.9,
 };
 
-export default function GlowControl({ value, defaultColor, onChange }: GlowControlProps) {
+export default function GlowControl({ value, onChange }: GlowControlProps) {
   const isEnabled = value?.enabled ?? false;
 
   const handleToggle = (enabled: boolean) => {

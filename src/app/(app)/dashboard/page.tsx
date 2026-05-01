@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import type { Prisma, Status } from "@prisma/client";
@@ -10,6 +10,7 @@ interface DashboardPageProps {
     status?: string;
     sort?: string;
     page?: string;
+    creatorId?: string;
   };
 }
 
@@ -26,10 +27,17 @@ const VALID_SORTS = ["newest", "oldest", "title"];
 export default async function DashboardPage({
   searchParams,
 }: DashboardPageProps) {
-  const session = await auth();
+  const session = await getServerSession();
   if (!session?.user?.id) {
     redirect("/login");
   }
+
+  const appRole = (session.user as { appRole: string }).appRole;
+  if (appRole === "VIEWER") {
+    redirect("/pending");
+  }
+
+  const userId = session.user.id;
 
   const q = searchParams.q?.trim() ?? "";
   const status = searchParams.status ?? "";
@@ -39,8 +47,16 @@ export default async function DashboardPage({
   const page = Math.max(1, Number(searchParams.page) || 1);
   const pageSize = 20;
 
+  // Admin pode filtrar por criador via query param
+  const filterUserId =
+    appRole === "ADMIN" && searchParams.creatorId
+      ? searchParams.creatorId
+      : appRole === "ADMIN"
+        ? undefined // admin sem filtro vê tudo
+        : userId; // creator vê só as suas
+
   const where: Prisma.CoverWhereInput = {
-    userId: session.user.id,
+    ...(filterUserId ? { userId: filterUserId } : {}),
     ...(q ? { title: { contains: q, mode: "insensitive" as const } } : {}),
   };
 
@@ -84,6 +100,15 @@ export default async function DashboardPage({
     db.cover.count({ where }),
   ]);
 
+  // Se admin está filtrando por criador, buscar nome do criador
+  let filteringUser = null;
+  if (appRole === "ADMIN" && searchParams.creatorId) {
+    filteringUser = await db.user.findUnique({
+      where: { id: searchParams.creatorId },
+      select: { name: true, email: true },
+    });
+  }
+
   const totalPages = Math.ceil(total / pageSize);
   const serialized = JSON.parse(JSON.stringify(covers));
 
@@ -96,6 +121,8 @@ export default async function DashboardPage({
       currentQ={q}
       currentStatus={status}
       currentSort={sort}
+      isAdmin={appRole === "ADMIN"}
+      filteringUser={filteringUser}
     />
   );
 }

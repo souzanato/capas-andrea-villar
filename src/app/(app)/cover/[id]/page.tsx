@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { notFound, redirect } from "next/navigation";
 import CoverStatusPoller from "@/components/CoverStatusPoller";
@@ -13,9 +13,14 @@ interface CoverDetailPageProps {
 export default async function CoverDetailPage({
   params,
 }: CoverDetailPageProps) {
-  const session = await auth();
+  const session = await getServerSession();
   if (!session?.user?.id) {
     redirect("/login");
+  }
+
+  const appRole = (session.user as { appRole: string }).appRole;
+  if (appRole === "VIEWER") {
+    redirect("/pending");
   }
 
   const cover = await db.cover.findUnique({

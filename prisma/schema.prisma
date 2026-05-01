@@ -23,26 +23,98 @@ enum Status {
   FAILED
 }
 
-enum Role {
+enum MessageRole {
   USER
   ASSISTANT
 }
 
-// ── Models ─────────────────────────────────────────
-
-model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
-
-  covers Cover[]
+enum Role {
+  VIEWER
+  CREATOR
+  ADMIN
 }
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EmailTokenType {
+  EMAIL_CONFIRMATION
+  PASSWORD_RESET
+}
+
+// ── Better Auth Models ─────────────────────────────
+
+model user {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          String    @default("user")
+  banned        Boolean?
+  banReason     String?
+  banExpires    DateTime?
+
+  // Campos customizados
+  appRole       Role      @default(VIEWER)
+
+  // Relações
+  sessions        session[]
+  accounts        account[]
+  covers          Cover[]
+  profileRequests ProfileRequest[]
+  emailTokens     EmailToken[]
+}
+
+model session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ── App Models ─────────────────────────────────────
 
 model Cover {
   id                String   @id @default(cuid())
   userId            String
-  user              User     @relation(fields: [userId], references: [id])
+  user              user     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title             String
   format            Format
   contentType       String
@@ -95,10 +167,31 @@ model GeneratedImage {
 }
 
 model Message {
-  id        String   @id @default(cuid())
+  id        String      @id @default(cuid())
   coverId   String
-  cover     Cover    @relation(fields: [coverId], references: [id], onDelete: Cascade)
-  role      Role
-  content   String   @db.Text
-  createdAt DateTime @default(now())
+  cover     Cover       @relation(fields: [coverId], references: [id], onDelete: Cascade)
+  role      MessageRole
+  content   String      @db.Text
+  createdAt DateTime    @default(now())
+}
+
+model EmailToken {
+  id        String         @id @default(cuid())
+  userId    String
+  user      user           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String         @unique
+  type      EmailTokenType
+  usedAt    DateTime?
+  createdAt DateTime       @default(now())
+}
+
+model ProfileRequest {
+  id         String        @id @default(cuid())
+  userId     String
+  user       user          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status     RequestStatus @default(PENDING)
+  message    String?
+  reviewedAt DateTime?
+  reviewedBy String?
+  createdAt  DateTime      @default(now())
 }

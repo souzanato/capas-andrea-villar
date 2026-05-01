@@ -6,6 +6,7 @@ import useImage from "use-image";
 import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import type { CoverLayout, TextBlock } from "@/lib/editor/layout-schema";
+import SafeZoneOverlay from "./SafeZoneOverlay";
 
 interface CoverCanvasProps {
   layout: CoverLayout;
@@ -16,6 +17,7 @@ interface CoverCanvasProps {
   onUpdateBlock: (id: string, updates: Partial<TextBlock>) => void;
   blockImages: Record<string, string>;
   stageRef?: React.RefObject<Konva.Stage | null>;
+  showSafeZone?: boolean;
 }
 
 export default function CoverCanvas({
@@ -27,6 +29,7 @@ export default function CoverCanvas({
   onUpdateBlock,
   blockImages,
   stageRef: externalStageRef,
+  showSafeZone = false,
 }: CoverCanvasProps) {
   const [baseImage, setBaseImage] = useState<HTMLImageElement | null>(null);
   const localStageRef = useRef<Konva.Stage>(null);
@@ -93,6 +96,11 @@ export default function CoverCanvas({
             height={nativeH}
           />
         </Layer>
+
+        {/* Safe zone overlay (entre a imagem e os blocos) */}
+        {showSafeZone && (
+          <SafeZoneOverlay width={nativeW} height={nativeH} />
+        )}
 
         {/* Layer 2: blocos de texto renderizados como imagem */}
         <Layer>

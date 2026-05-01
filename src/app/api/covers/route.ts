@@ -4,13 +4,17 @@ import { db } from "@/lib/db";
 import type { Prisma, Status } from "@prisma/client";
 import sharp from "sharp";
 import { coverFormSchema } from "@/lib/validators/cover";
+import { headers } from "next/headers";
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
+
+  const appRole = (session.user as { appRole: string }).appRole;
+  const userId = session.user.id;
 
   const url = new URL(request.url);
   const q = url.searchParams.get("q") || "";
@@ -21,8 +25,13 @@ export async function GET(request: NextRequest) {
 
   const ALLOWED_STATUSES = ["PENDING", "GENERATING_PROMPT", "GENERATING_IMAGE", "COMPLETED", "FAILED"];
 
+  // ADMIN vê todas as capas, CREATOR vê só as suas
+  const filterUserId = appRole === "ADMIN"
+    ? url.searchParams.get("creatorId") || undefined
+    : userId;
+
   const where: Prisma.CoverWhereInput = {
-    userId: session.user.id,
+    ...(filterUserId ? { userId: filterUserId } : {}),
     ...(q ? { title: { contains: q, mode: "insensitive" as const } } : {}),
   };
 
@@ -37,31 +46,38 @@ export async function GET(request: NextRequest) {
         ? { title: "asc" }
         : { createdAt: "desc" };
 
+  const coverSelect: Record<string, unknown> = {
+    id: true,
+    title: true,
+    format: true,
+    status: true,
+    createdAt: true,
+    updatedAt: true,
+    contentType: true,
+    generatedImages: {
+      orderBy: { version: "desc" as const },
+      take: 1,
+      select: {
+        id: true,
+        version: true,
+        width: true,
+        height: true,
+      },
+    },
+  };
+
+  // Incluir dados do criador para admin
+  if (appRole === "ADMIN") {
+    coverSelect.user = { select: { id: true, name: true, email: true } };
+  }
+
   const [covers, total] = await Promise.all([
     db.cover.findMany({
       where,
       orderBy,
       skip: (page - 1) * pageSize,
       take: pageSize,
-      select: {
-        id: true,
-        title: true,
-        format: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-        contentType: true,
-        generatedImages: {
-          orderBy: { version: "desc" },
-          take: 1,
-          select: {
-            id: true,
-            version: true,
-            width: true,
-            height: true,
-          },
-        },
-      },
+      select: coverSelect,
     }),
     db.cover.count({ where }),
   ]);
@@ -76,10 +92,15 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+  }
+
+  const appRole = (session.user as { appRole: string }).appRole;
+  if (appRole !== "CREATOR" && appRole !== "ADMIN") {
+    return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
   }
 
   try {

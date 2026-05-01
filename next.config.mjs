@@ -1,8 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    domains: ["lh3.googleusercontent.com"],
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "img-src 'self' data: blob: https://lh3.googleusercontent.com https://lh4.googleusercontent.com https://lh5.googleusercontent.com https://lh6.googleusercontent.com;",
+          },
+        ],
+      },
+    ];
+  },
   webpack: (config) => {
-    // Konva tenta importar o módulo "canvas" no servidor (que não existe)
-    // Marcamos como external pra resolver
     config.externals = [
       ...(config.externals || []),
       { canvas: "canvas" },

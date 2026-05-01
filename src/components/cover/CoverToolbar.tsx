@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLoading } from "@/components/LoadingOverlay";
 import {
   Undo2,
   Redo2,
@@ -10,6 +11,8 @@ import {
   Trash2,
   ChevronDown,
   RefreshCw,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +55,8 @@ interface CoverToolbarProps {
   canRedo: boolean;
   stageRef: React.RefObject<Konva.Stage | null>;
   onSave?: () => void;
+  showSafeZone?: boolean;
+  onToggleSafeZone?: () => void;
 }
 
 export default function CoverToolbar({
@@ -66,57 +71,58 @@ export default function CoverToolbar({
   canRedo,
   stageRef,
   onSave,
+  showSafeZone = false,
+  onToggleSafeZone,
 }: CoverToolbarProps) {
   const router = useRouter();
+  const { withLoading } = useLoading();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
-  const [exporting, setExporting] = useState(false);
 
   async function handleExport() {
     const stage = stageRef.current;
     if (!stage) return;
 
-    setExporting(true);
-    try {
-      // 1. Esconde o Transformer antes de exportar
-      const transformer = stage.findOne("Transformer");
-      if (transformer) transformer.hide();
-      stage.draw();
+    await withLoading(async () => {
+      try {
+        // 1. Esconde o Transformer antes de exportar
+        const transformer = stage.findOne("Transformer");
+        if (transformer) transformer.hide();
+        stage.draw();
 
-      // 2. Gera PNG do canvas
-      const dataUrl = stage.toDataURL({ pixelRatio: 2 });
+        // 2. Gera PNG do canvas
+        const dataUrl = stage.toDataURL({ pixelRatio: 2 });
 
-      // Restaura o Transformer
-      if (transformer) transformer.show();
-      stage.draw();
+        // Restaura o Transformer
+        if (transformer) transformer.show();
+        stage.draw();
 
-      // 2. Salva no banco
-      const res = await fetch(`/api/covers/${cover.id}/save`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dataUrl }),
-      });
+        // 2. Salva no banco
+        const res = await fetch(`/api/covers/${cover.id}/save`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dataUrl }),
+        });
 
-      if (!res.ok) throw new Error("Erro ao salvar");
+        if (!res.ok) throw new Error("Erro ao salvar");
 
-      // Salva layoutJson também
-      onSave?.();
+        // Salva layoutJson também
+        onSave?.();
 
-      // Dispara download no browser
-      const link = document.createElement("a");
-      link.href = dataUrl; // usa o dataUrl local pra não precisar re-fetch
-      link.download = `capa-${cover.id}-v${Date.now()}.png`;
-      link.click();
+        // Dispara download no browser
+        const link = document.createElement("a");
+        link.href = dataUrl; // usa o dataUrl local pra não precisar re-fetch
+        link.download = `capa-${cover.id}-v${Date.now()}.png`;
+        link.click();
 
-      toast.success("Exportado! Imagem salva e baixada.");
-      router.refresh();
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao exportar");
-    } finally {
-      setExporting(false);
-    }
+        toast.success("Exportado! Imagem salva e baixada.");
+        router.refresh();
+      } catch (err) {
+        console.error(err);
+        toast.error("Erro ao exportar");
+      }
+    });
   }
 
   async function handleCopyPrompt() {
@@ -208,16 +214,29 @@ export default function CoverToolbar({
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Safe zone */}
+      {onToggleSafeZone && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1"
+          onClick={onToggleSafeZone}
+          title={showSafeZone ? "Esconder área de segurança" : "Mostrar área de segurança"}
+        >
+          {showSafeZone ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          {showSafeZone ? "Safe zone" : "Safe zone"}
+        </Button>
+      )}
+
       {/* Exportar PNG */}
       <Button
         variant="default"
         size="sm"
         className="gap-1"
         onClick={handleExport}
-        disabled={exporting}
       >
-        <Download className={`h-4 w-4 ${exporting ? "animate-pulse" : ""}`} />
-        {exporting ? "Exportando..." : "Exportar PNG"}
+        <Download className="h-4 w-4" />
+        Exportar PNG
       </Button>
 
       {/* Copiar prompt */}

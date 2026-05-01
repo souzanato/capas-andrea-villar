@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -30,7 +31,8 @@ export async function POST(
     return NextResponse.json({ error: "Cover not found" }, { status: 404 });
   }
 
-  if (cover.userId !== session.user.id) {
+  const appRole = (session.user as { appRole: string }).appRole;
+  if (cover.userId !== session.user.id && appRole !== "ADMIN") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

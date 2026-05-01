@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { runFullPipeline } from "@/lib/pipeline/orchestrator";
 import { log, error as logError, logSync } from "@/lib/pipeline/debug-logger";
+import { headers } from "next/headers";
 
 export async function POST(
   request: NextRequest,
@@ -20,7 +21,7 @@ export async function POST(
   await log(fn, "enter", { coverId: params.id });
 
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
 
     if (!session?.user?.id) {
       await log(fn, "exit", { status: 401, error: "Not authenticated" });
@@ -34,7 +35,8 @@ export async function POST(
       return NextResponse.json({ error: "Capa não encontrada" }, { status: 404 });
     }
 
-    if (cover.userId !== session.user.id) {
+    const appRole = (session.user as { appRole: string }).appRole;
+    if (cover.userId !== session.user.id && appRole !== "ADMIN") {
       await log(fn, "exit", { status: 403, error: "Not authorized" });
       return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
     }

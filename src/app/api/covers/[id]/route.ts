@@ -1,23 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { headers } from "next/headers";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
 
   const cover = await db.cover.findUnique({
     where: { id: params.id },
-    select: { id: true, status: true, errorMessage: true },
+    select: { id: true, status: true, errorMessage: true, userId: true },
   });
 
   if (!cover) {
     return NextResponse.json({ error: "Capa não encontrada" }, { status: 404 });
+  }
+
+  const appRole = (session.user as { appRole: string }).appRole;
+  if (cover.userId !== session.user.id && appRole !== "ADMIN") {
+    return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
   }
 
   return NextResponse.json(cover);
@@ -27,9 +33,14 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+  }
+
+  const appRole = (session.user as { appRole: string }).appRole;
+  if (appRole !== "CREATOR" && appRole !== "ADMIN") {
+    return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
   }
 
   const cover = await db.cover.findUnique({ where: { id: params.id } });
@@ -38,7 +49,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Capa não encontrada" }, { status: 404 });
   }
 
-  if (cover.userId !== session.user.id) {
+  if (cover.userId !== session.user.id && appRole !== "ADMIN") {
     return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
   }
 
@@ -51,9 +62,14 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const appRole = (session.user as { appRole: string }).appRole;
+  if (appRole !== "CREATOR" && appRole !== "ADMIN") {
+    return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
   }
 
   const cover = await db.cover.findUnique({ where: { id: params.id } });
@@ -62,7 +78,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Cover not found" }, { status: 404 });
   }
 
-  if (cover.userId !== session.user.id) {
+  if (cover.userId !== session.user.id && appRole !== "ADMIN") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

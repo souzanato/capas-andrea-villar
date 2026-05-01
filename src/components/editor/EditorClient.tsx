@@ -35,10 +35,11 @@ interface EditorClientProps {
   onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
   coverId: string;
   onSaveStatusChange?: (status: SaveStatus) => void;
+  showSafeZone?: boolean;
 }
 
 const EditorClient = forwardRef<EditorHandle, EditorClientProps>(function EditorClient(
-  { initialLayout, baseImageUrl, onLayoutChange, stageRef: externalStageRef, onHistoryChange, coverId, onSaveStatusChange },
+  { initialLayout, baseImageUrl, onLayoutChange, stageRef: externalStageRef, onHistoryChange, coverId, onSaveStatusChange, showSafeZone },
   ref
 ) {
   const { current: layout, push: pushLayout, undo, redo, canUndo, canRedo } =
@@ -275,6 +276,7 @@ const EditorClient = forwardRef<EditorHandle, EditorClientProps>(function Editor
           onUpdateBlock={updateBlock}
           blockImages={blockImages}
           stageRef={externalStageRef}
+          showSafeZone={showSafeZone}
         />
       </div>
 

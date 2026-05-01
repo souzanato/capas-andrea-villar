@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import CoverCard from "./CoverCard";
@@ -33,6 +34,8 @@ interface DashboardClientProps {
   currentQ: string;
   currentStatus: string;
   currentSort: string;
+  isAdmin?: boolean;
+  filteringUser?: { name: string | null; email: string } | null;
 }
 
 const STATUS_OPTIONS = [
@@ -57,12 +60,21 @@ export default function DashboardClient({
   currentQ,
   currentStatus,
   currentSort,
+  isAdmin,
+  filteringUser,
 }: DashboardClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [covers, setCovers] = useState(initialCovers);
   const [totalCount, setTotalCount] = useState(total);
   const [searchInput, setSearchInput] = useState(currentQ);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    if (searchParams.get("confirmed") === "true") {
+      toast.success("Conta confirmada com sucesso! Bem-vinda(o)!");
+    }
+  }, []);
 
   // Sync when props change (after URL update + server re-render)
   useEffect(() => {
@@ -136,7 +148,7 @@ export default function DashboardClient({
       <div className="flex items-end justify-between mb-8 pb-6 border-b border-border">
         <div>
           <h1 className="text-2xl font-medium text-foreground tracking-tight">
-            Suas capas
+            {isAdmin ? "Todas as capas" : "Suas capas"}
           </h1>
           <p className="text-sm text-foreground-soft mt-1">
             {totalCount === 0
@@ -148,6 +160,19 @@ export default function DashboardClient({
           <Link href="/new">Nova capa</Link>
         </Button>
       </div>
+
+      {/* Banner de filtro por criador (admin) */}
+      {filteringUser && (
+        <div className="flex items-center justify-between rounded-lg bg-muted px-4 py-3 text-sm">
+          <span>
+            Mostrando capas de{" "}
+            <strong>{filteringUser.name ?? filteringUser.email}</strong>
+          </span>
+          <Link href="/dashboard" className="text-primary underline text-xs">
+            Ver todas
+          </Link>
+        </div>
+      )}
 
       {/* Search + Filters */}
       <div className="flex flex-col sm:flex-row gap-3">

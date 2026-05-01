@@ -96,7 +96,6 @@ export default function ToolsPanel({ selectedBlock, onUpdate }: ToolsPanelProps)
       <TabsContent value="efeitos" className="space-y-4 mt-3">
         <GlowControl
           value={effects?.glow ?? null}
-          defaultColor="#FFFFFF"
           onChange={(glow) => updateEffects({ glow })}
         />
         <ShadowControl
