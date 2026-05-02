@@ -16,7 +16,10 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? "https://capas.andreavillar.com.br";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Capas Andrea Villar",
     template: "%s · Capas Andrea Villar",
@@ -30,6 +33,15 @@ export const metadata: Metadata = {
     description: "Capas que impulsionam.",
     type: "website",
     locale: "pt_BR",
+    siteName: "Capas Andrea Villar",
+    images: [
+      {
+        url: "/logo-andrea.png",
+        width: 512,
+        height: 512,
+        alt: "Capas Andrea Villar",
+      },
+    ],
   },
   formatDetection: {
     telephone: false,
