@@ -59,6 +59,26 @@ interface CoverToolbarProps {
   onToggleSafeZone?: () => void;
 }
 
+/** Converte uma data URL (base64) em Blob */
+function dataUrlToBlob(dataUrl: string): Blob {
+  const parts = dataUrl.split(",");
+  const mime = parts[0]?.match(/:(.*?);/)?.[1] ?? "image/png";
+  const binary = atob(parts[1]);
+  const array = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    array[i] = binary.charCodeAt(i);
+  }
+  return new Blob([array], { type: mime });
+}
+
+/** Verifica se o navegador suporta Web Share API com compartilhamento de arquivos */
+function canShareFile(blob: Blob, filename: string): boolean {
+  if (typeof navigator === "undefined") return false;
+  if (!navigator.canShare) return false;
+  const file = new File([blob], filename, { type: "image/png" });
+  return navigator.canShare({ files: [file] });
+}
+
 export default function CoverToolbar({
   cover,
   versions,
@@ -110,11 +130,40 @@ export default function CoverToolbar({
         // Salva layoutJson também
         onSave?.();
 
-        // Dispara download no browser
+        // 4. Dispara download no browser
+        // Converte data URL para Blob (mais confiável que data URL,
+        // especialmente em mobile onde data URLs sofrem restrições)
+        const blob = dataUrlToBlob(dataUrl);
+        const url = URL.createObjectURL(blob);
+        const filename = `capa-${cover.id}-v${Date.now()}.png`;
+
+        // Tenta Web Share API primeiro (melhor UX no iOS —
+        // mostra a share sheet nativa com opção "Salvar imagem")
+        if (canShareFile(blob, filename)) {
+          try {
+            await navigator.share({
+              files: [new File([blob], filename, { type: "image/png" })],
+              title: "Capa exportada",
+            });
+            toast.success("Exportado! Imagem salva no dispositivo.");
+            URL.revokeObjectURL(url);
+            router.refresh();
+            return;
+          } catch {
+            // Usuário cancelou ou share falhou — tenta fallback
+          }
+        }
+
+        // Fallback: anchor click com Blob URL (funciona em desktop e Android)
         const link = document.createElement("a");
-        link.href = dataUrl; // usa o dataUrl local pra não precisar re-fetch
-        link.download = `capa-${cover.id}-v${Date.now()}.png`;
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+
+        // Libera a blob URL após uso
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
 
         toast.success("Exportado! Imagem salva e baixada.");
         router.refresh();
